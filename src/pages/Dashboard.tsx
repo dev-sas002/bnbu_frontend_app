@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
   if (isSuccess && data) {
     return (
       <Layout>
-        <div className="flex-1 p-6 bg-white shadow-md rounded-lg">
+        <div className="flex-1 bg-white">
           {data.user_type === 'admin' ? <AdminDashboard /> : <UserDashboard />}
         </div>
       </Layout>

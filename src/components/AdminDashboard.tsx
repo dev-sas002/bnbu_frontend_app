@@ -83,7 +83,7 @@ const AdminDashboard: React.FC = () => {
   if (isError) return <div>Error loading users</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-5">
       <div>
         <h2 className="text-2xl font-bold mb-4">User Management</h2>
         <button

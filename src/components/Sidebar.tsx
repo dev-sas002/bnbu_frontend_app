@@ -20,7 +20,7 @@ const Sidebar: React.FC = () => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed top-16 left-0 bottom-0 bg-gray-100 z-40 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0 md:static md:h-screen md:overflow-auto w-64 p-6 h-screen`}
+                className={`fixed top-16 left-0 bottom-0 bg-gray-300 z-40 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0 md:static md:h-screen md:overflow-auto w-64 p-6 h-screen`}
             >
                 {/* Close Button for smaller screens */}
                 <button onClick={toggleSidebar} className="md:hidden absolute top-4 right-4 z-50">
