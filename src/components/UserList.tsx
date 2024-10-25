@@ -12,16 +12,15 @@ export interface User {
 }
 
 interface UserListProps {
+  users : any
   onEdit: (user: User) => void
   onDelete: (id: number) => void
+  currentPage: number
+  setCurrentPage: (page: number) => void
 }
 
-const UserList: React.FC<UserListProps> = ({ onEdit, onDelete }) => {
-  const [page, setPage] = useState(1)
-  const { data, isLoading, isError } = useGetUsersQuery(page)
+const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage, setCurrentPage}) => {
 
-  if (isLoading) return <div>Loading...</div>
-  if (isError) return <div>Error loading users</div>
 
   return (
     <div className="mt-8">
@@ -51,7 +50,7 @@ const UserList: React.FC<UserListProps> = ({ onEdit, onDelete }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {data.results.map((user: User) => (
+            {users.results.map((user: User) => (
               <tr key={user.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.email}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.first_name}</td>
@@ -80,16 +79,16 @@ const UserList: React.FC<UserListProps> = ({ onEdit, onDelete }) => {
         </table>
         <div className="flex justify-between mt-4">
           <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
+            onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
           >
             Previous
           </button>
-          <span>Page {page}</span>
+          <span>Page {currentPage}</span>
           <button
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={!data.next}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={!users.next}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
           >
             Next

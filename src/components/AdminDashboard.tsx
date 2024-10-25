@@ -124,7 +124,7 @@ const AdminDashboard: React.FC = () => {
         </Modal>
 
         <UserList
-          users={userList} // Use local state for users
+          users={users} // Use local state for users
           onEdit={(user) => {
             setSelectedUser(user);
             setIsCreating(false);
@@ -136,7 +136,7 @@ const AdminDashboard: React.FC = () => {
         />
       </div>
       <div>
-        <h2 className="text-2xl font-bold mb-4">User Statistics</h2>
+        <h2 className="text-2xl font-bold mb-4">User Statistics for Page {currentPage}</h2>
         <Chart data={userList} /> {/* Use local state for user statistics */}
       </div>
       <div className="px-4 py-5">
