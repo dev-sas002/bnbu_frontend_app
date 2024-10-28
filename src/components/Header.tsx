@@ -47,7 +47,7 @@ const Header: React.FC = () => {
   if (isLoading) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 flex items-center justify-between bg-red-500 p-4 z-50 shadow-lg">
+    <header className="fixed top-0 left-0 right-0 flex items-center justify-between bg-red-500 p-2 z-50 shadow-lg">
       <div className="flex items-center">
         <img src={bnbLogo} alt="bnb University Logo" className="h-14" />
       </div>
