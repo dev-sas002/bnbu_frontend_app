@@ -5,7 +5,6 @@ import UserForm from './UserForm';
 import UserList, { User } from './UserList';
 import Chart from './Chart';
 import { useDispatch } from 'react-redux';
-import { logout as logoutAction } from '../store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import Modal from './Modal';
 
@@ -15,7 +14,6 @@ const AdminDashboard: React.FC = () => {
   const [createUser] = useCreateUserMutation();
   const [updateUser] = useUpdateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
-  const [logout] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -61,17 +59,6 @@ const AdminDashboard: React.FC = () => {
       refetch(); // Refetch the users after deleting a user
     } catch (err) {
       toast.error('Failed to delete user');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout({}).unwrap();
-      dispatch(logoutAction());
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      toast.error('Logout failed');
     }
   };
 
@@ -139,14 +126,6 @@ const AdminDashboard: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold mb-4">User Statistics for Page {currentPage}</h2>
         <Chart data={userList} /> {/* Use local state for user statistics */}
-      </div>
-      <div className="px-4 py-5">
-        <button
-          onClick={handleLogout}
-          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );

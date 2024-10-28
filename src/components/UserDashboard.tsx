@@ -3,26 +3,14 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { useGetUserProfileQuery, useLogoutMutation } from '../services/api';
-import { logout as logoutAction } from '../store/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 const UserDashboard: React.FC = () => {
   const { data: user, isLoading } = useGetUserProfileQuery();
-  const [logout] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);
   console.log('User:', user);
-
-  const handleLogout = async () => {
-    try {
-      await logout({}).unwrap();
-      dispatch(logoutAction());
-      navigate('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
 
   if (isLoading) {
     return <div>Loading user information...</div>;
@@ -64,14 +52,6 @@ const UserDashboard: React.FC = () => {
             </dd>
           </div>
         </dl>
-      </div>
-      <div className="px-4 py-5 sm:px-6 text-center">
-        <button
-          onClick={handleLogout}
-          className="mt-4 inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );
