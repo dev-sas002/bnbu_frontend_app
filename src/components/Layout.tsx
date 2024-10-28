@@ -6,11 +6,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div className="min-h-screen bg-white">
             <Header />
-            <div className="flex pt-16"> {/* Add padding to prevent content overlap */}
+            <div className="flex pt-16 h-screen">
                 {/* Sidebar */}
                 <Sidebar />
                 {/* Main content */}
-                <main className="flex-1">
+                <main className="flex-1 overflow-y-auto">
                     {children}
                 </main>
             </div>
