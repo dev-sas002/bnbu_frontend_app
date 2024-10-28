@@ -1,5 +1,6 @@
+// /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/components/AdminDashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { useGetUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation, useLogoutMutation } from '../services/api';
+import { useGetUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation} from '../services/api';
 import { toast } from 'react-toastify';
 import UserForm from './UserForm';
 import UserList, { User } from './UserList';

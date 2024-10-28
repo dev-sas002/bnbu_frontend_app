@@ -1,8 +1,8 @@
-// /src/components/UserDashboard.tsx
+// /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/components/UserDashboard.tsx
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { useGetUserProfileQuery, useLogoutMutation } from '../services/api';
+import { useGetUserProfileQuery} from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const UserDashboard: React.FC = () => {
