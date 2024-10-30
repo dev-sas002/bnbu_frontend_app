@@ -83,19 +83,20 @@ const AdminDashboard: React.FC = () => {
   if (isError) return <div>Error loading users</div>;
 
   return (
-    <div className="space-y-6 p-5">
+    <div className="space-y-10 p-5">
       <div>
-        <h2 className="text-2xl font-bold mb-4">User Management</h2>
+        <div className="flex justify-end">
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-red-500 text-white px-4 py-2 rounded"
           onClick={() => {
             setIsCreating(true);
             setIsModalOpen(true);
             setSelectedUser(null);
           }}
-        >
+          >
           Create New User
         </button>
+        </div>
 
         <Modal isOpen={isModalOpen} onClose={() => {
           setIsModalOpen(false);

@@ -24,51 +24,38 @@ const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage
 
   return (
     <div className="mt-8">
-      <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">User List</h3>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="relative overflow-x-auto shadow-md">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-200">
             <tr>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                First Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                User Type
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th scope="col" className="px-6 py-3 text-center">Email</th>
+              <th scope="col" className="px-6 py-3 text-center">First Name</th>
+              <th scope="col" className="px-6 py-3 text-center">Last Name</th>
+              <th scope="col" className="px-6 py-3 text-center">User Type</th>
+              <th scope="col" className="px-6 py-3 text-center">Status</th>
+              <th scope="col" className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="odd:bg-white even:bg-gray-50 border-b">
             {users.results.map((user: User) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.first_name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.last_name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">{user.user_type}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
+              <tr key={user.id} className='border-b'>
+                <td className="px-6 py-4 text-center text-gray-900">{user.email}</td>
+                <td className="px-6 py-4 text-center text-gray-500">{user.first_name}</td>
+                <td className="px-6 py-4 text-center text-gray-500">{user.last_name}</td>
+                <td className="px-6 py-4 text-center text-gray-500">{user.user_type}</td>
+                <td className="px-6 py-4 text-center text-gray-500">
                   {user.is_active ? 'Active' : 'Inactive'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                <td className="px-6 py-4 text-center font-medium">
                   <button
                     onClick={() => onEdit(user)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    className="text-blue-600 hover:underline mr-4"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-600 hover:underline"
                   >
                     Delete
                   </button>
@@ -77,19 +64,19 @@ const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage
             ))}
           </tbody>
         </table>
-        <div className="flex justify-between mt-4">
+        <div className="flex justify-between p-5 bg-white">
           <button
             onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-red-700 text-white rounded disabled:opacity-50"
           >
             Previous
           </button>
-          <span>Page {currentPage}</span>
+          <span className="text-gray-500">Page {currentPage}</span>
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={!users.next}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-red-700 text-white rounded disabled:opacity-50"
           >
             Next
           </button>
@@ -98,5 +85,6 @@ const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage
     </div>
   )
 }
+
 
 export default UserList

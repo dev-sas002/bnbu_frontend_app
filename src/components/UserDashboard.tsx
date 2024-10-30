@@ -33,7 +33,7 @@ const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg max-w-4xl mx-auto my-8 p-4 sm:p-6 lg:p-8">
+    <div className="bg-white shadow overflow-hidden sm:rounded-lg max-w-4xl pt-8 p-4 h-full sm:p-6 lg:p-8 mx-auto">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           User Information
