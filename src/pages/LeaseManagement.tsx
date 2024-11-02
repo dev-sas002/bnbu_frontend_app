@@ -2,23 +2,40 @@ import React, { useState } from 'react';
 import LeaseTable from '../components/LeaseTable';
 import LeaseSearchBar from '../components/LeaseSearchBar';
 import UploadLeaseModal from '../components/UploadLeaseModal';
-import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery} from '../services/api';
+import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery } from '../services/api';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 
 const LeaseManagement = () => {
-  const [page, setPage] = useState(1); // State for current page
-  const { data: leases, refetch, isLoading, isError } = useGetAllLeasesQuery(page); // Fetch leases based on current page
+  const [page, setPage] = useState(1);
+  const { data: leases, refetch, isLoading, isError } = useGetAllLeasesQuery(page);
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadLease] = useUploadLeaseMutation();
   const [updateLease] = useUpdateLeaseMutation();
+  const [searchFilters, setSearchFilters] = useState({
+    address: '',
+    status: '',
+    startDate: undefined,
+    endDate: undefined,
+  });
 
+  const isFilterApplied = () => {
+    return searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate;
+  };
+
+  const { data: searchResults } = useSearchLeasesQuery(searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate ? searchFilters : undefined);
+
+  const displayedLeases =  isFilterApplied() ? searchResults : leases?.results;
+  console.log("displayedLeases:", displayedLeases);
+  console.log("searchResults:", searchResults);
+  console.log("leases:", leases);
+  console.log("filters:", searchFilters);
 
   const handleUploadLease = async (leaseData: FormData) => {
     try {
       await uploadLease(leaseData).unwrap();
-      refetch(); // Refresh leases after upload
-      setUploadModalOpen(false); // Close modal on success
+      refetch();
+      setUploadModalOpen(false);
     } catch (error) {
       console.error("Failed to upload lease:", error);
     }
@@ -27,25 +44,27 @@ const LeaseManagement = () => {
   const handleUpdateLease = async (leaseData: Lease) => {
     try {
       await updateLease(leaseData).unwrap();
-      refetch(); // Refresh leases after update
+      refetch();
     } catch (error) {
       console.error("Failed to update lease:", error);
     }
   };
 
-
-  // Handle page change
+  const handleSearch = (filters: any) => {
+    setSearchFilters(filters);
+  };
+  
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    refetch(); // Refetch leases when page changes
+    refetch();
   };
 
   if (isLoading) {
-    return <Layout><div>Loading...</div></Layout>; // Keep Layout for loading state
+    return <Layout><div>Loading...</div></Layout>;
   }
 
   if (isError) {
-    return <Layout><div>Error loading leases</div></Layout>; // Keep Layout for error state
+    return <Layout><div>Error loading leases</div></Layout>;
   }
 
   return (
@@ -60,10 +79,9 @@ const LeaseManagement = () => {
             Upload Lease
           </button>
         </div>
-        <LeaseSearchBar onSearch={refetch} />
-        <LeaseTable leases={leases?.results || []} onUpdate={handleUpdateLease} />
+        <LeaseSearchBar onSearch={handleSearch} />
+        <LeaseTable leases={displayedLeases} onUpdate={handleUpdateLease} />
 
-        
         {/* Pagination Controls */}
         <div className="flex justify-between items-center mt-4">
           <button
@@ -76,7 +94,7 @@ const LeaseManagement = () => {
           <span className="mx-4">Page {page}</span>
           <button
             onClick={() => handlePageChange(page + 1)}
-            disabled={!leases?.next} // Disable if there is no next page
+            disabled={!leases?.next}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
           >
             Next
@@ -87,13 +105,12 @@ const LeaseManagement = () => {
         <UploadLeaseModal
           isOpen={isUploadModalOpen}
           onClose={() => setUploadModalOpen(false)}
-          onUpload={handleUploadLease} // Pass handler to upload lease
-          onUpdate={handleUpdateLease} // Pass handler to update lease
+          onUpload={handleUploadLease}
+          onUpdate={handleUpdateLease}
         />
       </div>
     </Layout>
   );
-
 };
 
 export default LeaseManagement;
