@@ -16,7 +16,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData, onCancel }) 
       email: initialData?.email || '',
       first_name: initialData?.first_name || '',
       last_name: initialData?.last_name || '',
-      user_type: initialData?.user_type || 'general',
+      user_type: initialData?.user_type || 'customer',
       is_active: initialData?.is_active !== undefined ? initialData.is_active : true,
     },
     validationSchema: Yup.object({
@@ -41,7 +41,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData, onCancel }) 
         email: initialData.email || '',
         first_name: initialData.first_name || '',
         last_name: initialData.last_name || '',
-        user_type: initialData.user_type || 'general',
+        user_type: initialData.user_type || 'customer',
         is_active: initialData.is_active !== undefined ? initialData.is_active : true,
       })
     }
@@ -113,7 +113,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialData, onCancel }) 
           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           <option value="admin">Admin</option>
-          <option value="general">General</option>
+          <option value="customer">Customer</option>
           <option value="research">Research</option>
           <option value="coach">Coach</option>
           <option value="client">Client</option>

@@ -108,8 +108,89 @@ export const api = createApi({
         method: 'POST',
       }),
     }),
+
+    // Lease API endpoints
+    // Get all leases
+    // getAllLeases: builder.query({
+    //   query: () => 'api/leases/',
+    // }),
+
+    // Fetch all leases with pagination
+    getAllLeases: builder.query({
+      query: (page = 1) => `api/leases/?page=${page}`, // Include page number in query
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+
+    // Upload lease
+    uploadLease: builder.mutation({
+      query: (leaseData) => ({
+        url: 'api/leases/upload/',
+        method: 'POST',
+        body: leaseData,
+      }),
+    }),
+
+    // Fetch a list of leases with search functionality
+    searchLeases: builder.query({
+      query: (params) => {
+        const { address, startDate, endDate, status } = params || {};
+        let query = 'api/leases/search/?';
+        
+        // Append address to the query if provided
+        if (address) query += `address=${encodeURIComponent(address)}&`;
+        
+        // Append startDate to the query if provided
+        if (startDate) query += `start_date=${encodeURIComponent(startDate)}&`;
+        
+        // Append endDate to the query if provided
+        if (endDate) query += `end_date=${encodeURIComponent(endDate)}&`;
+        
+        // Append status to the query if provided
+        if (status) query += `status=${encodeURIComponent(status)}`;
+        
+        // Remove the last '&' if it exists
+        if (query.endsWith('&')) {
+          query = query.slice(0, -1);
+        }
+        
+        return query;
+      },
+    }),
+
+
+    // Fetch a single lease by ID
+    getLeaseById: builder.query({
+      query: (id) => `api/leases/${id}/`,
+    }),
+
+    // Revise lease documents for an existing lease
+    reviseLease: builder.mutation({
+      query: ({ id, revisedData }) => ({
+        url: `api/leases/${id}/revised/`,
+        method: 'POST',
+        body: revisedData,
+      }),
+    }),
+
+    // Update lease information
+    updateLease: builder.mutation({
+      query: ({ id, ...leaseData }) => ({
+        url: `api/leases/${id}/update/`,  // Changed to call the update action
+        method: 'PUT',                   // Changed from PUT to PATCH
+        body: leaseData,
+      }),
+    }),
+
+    // Delete a lease
+    deleteLease: builder.mutation({
+      query: (id) => ({
+        url: `api/leases/${id}/`,  // This should still point to the delete action for the lease
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
+
 
 export const {
   useLoginMutation,
@@ -123,4 +204,11 @@ export const {
   useGetDashboardQuery,
   useGetUserProfileQuery,
   useLogoutMutation,
+  useGetAllLeasesQuery,
+  useUploadLeaseMutation,
+  useSearchLeasesQuery,
+  useGetLeaseByIdQuery,
+  useReviseLeaseMutation,
+  useUpdateLeaseMutation, 
+  useDeleteLeaseMutation,
 } = api

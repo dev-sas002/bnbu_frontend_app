@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false); // State for sidebar visibility
+    const navigate = useNavigate(); // Hook to handle navigation
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen); // Toggle the sidebar open/close state
     };
+
+    const goToLeasePage = () => {
+      navigate('/leases'); // Navigate to Lease Management page
+      setIsOpen(false); // Close sidebar after navigation
+  };
 
     return (
         <div>
@@ -69,6 +76,13 @@ const Sidebar: React.FC = () => {
                                     <span>Add New Property</span>
                                 </li>
                             </ul>
+                        </li>
+                        {/* Lease Management */}
+                        <li
+                            onClick={goToLeasePage}
+                            className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                            <span>📋</span>
+                            <span>LeaseGuard AI</span>
                         </li>
                     </ul>
                 </nav>

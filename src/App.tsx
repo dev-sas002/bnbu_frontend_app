@@ -3,6 +3,8 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import UpdatePassword from './pages/UpdatePassword';
 import PrivateRoute from './components/PrivateRoute'
+import LeaseManagement from './pages/LeaseManagement';
+
 import './App.css'
 
 const App: React.FC = () => {
@@ -18,6 +20,14 @@ const App: React.FC = () => {
         }
       />
       <Route path="/update-password/:id" element={<UpdatePassword />} />
+      <Route
+        path="/leases"
+        element={
+          <PrivateRoute>
+            <LeaseManagement />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   )
 }

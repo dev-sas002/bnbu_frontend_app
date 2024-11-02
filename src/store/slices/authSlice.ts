@@ -1,12 +1,12 @@
 // /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/store/slices/authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface AuthState {
+export interface AuthState {
   user: User | null
   token: string | null
 }
 
-interface User {
+export interface User {
   id: number
   email: string
   user_type: string
