@@ -133,9 +133,12 @@ export const api = createApi({
     // Fetch a list of leases with search functionality
     searchLeases: builder.query({
       query: (params) => {
-        const { address, startDate, endDate, status } = params || {};
-        let query = 'api/leases/search/?';
+        const {page, address, startDate, endDate, status } = params || {};
+        let query = `api/leases/search/?`;
         
+        // Append page to the query if provided and defined
+        if (page !== undefined) query += `page=${page}&`;
+
         // Append address to the query if provided
         if (address) query += `address=${encodeURIComponent(address)}&`;
         

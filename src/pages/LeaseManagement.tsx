@@ -5,6 +5,7 @@ import UploadLeaseModal from '../components/UploadLeaseModal';
 import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery } from '../services/api';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
+import { set } from 'react-datepicker/dist/date_utils';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -23,13 +24,22 @@ const LeaseManagement = () => {
     return searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate;
   };
 
-  const { data: searchResults } = useSearchLeasesQuery(searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate ? searchFilters : undefined);
+  // const { data: searchResults } = useSearchLeasesQuery(searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate ? {...searchFilters, "page" : page} : undefined );
+  const { data: searchResults } = useSearchLeasesQuery(
+    isFilterApplied() ? { ...searchFilters, ...(page ? { page } : {}) } : undefined
+  );
+  
 
-  const displayedLeases =  isFilterApplied() ? searchResults : leases?.results;
-  console.log("displayedLeases:", displayedLeases);
-  console.log("searchResults:", searchResults);
-  console.log("leases:", leases);
-  console.log("filters:", searchFilters);
+  const displayedLeases =  isFilterApplied() ? searchResults?.results : leases?.results;
+  // console.log("displayedLeases:", displayedLeases);
+  // console.log("searchResults:", searchResults);
+  // console.log("leases:", leases);
+  // console.log("filters:", searchFilters);
+  // console.log("================>")
+  // console.log("Search filters:", searchFilters);
+  // console.log("Current page:", page);
+  // console.log("Final search query:", isFilterApplied() ? { ...searchFilters, ...(page ? { page } : {}) } : undefined);
+
 
   const handleUploadLease = async (leaseData: FormData) => {
     try {
@@ -52,6 +62,7 @@ const LeaseManagement = () => {
 
   const handleSearch = (filters: any) => {
     setSearchFilters(filters);
+    setPage(1);
   };
   
   const handlePageChange = (newPage: number) => {
@@ -94,7 +105,7 @@ const LeaseManagement = () => {
           <span className="mx-4">Page {page}</span>
           <button
             onClick={() => handlePageChange(page + 1)}
-            disabled={!leases?.next}
+            disabled={isFilterApplied() ? !searchResults?.next : !leases?.next}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
           >
             Next
