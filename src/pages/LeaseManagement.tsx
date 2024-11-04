@@ -81,8 +81,8 @@ const LeaseManagement = () => {
 
   return (
     <Layout>
-      <div className="p-4 flex-1 bg-white">
-        <div className="flex justify-between items-center mb-4">
+      <div className="p-4 flex-1 bg-white w-full mx-auto">
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
           <h2 className="text-xl font-semibold">Your Leases</h2>
           <button
             onClick={() => setUploadModalOpen(true)}

@@ -46,17 +46,24 @@ const DocumentPreview: React.FC = () => {
   
 
     return (
-        <div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
             {documentUrl && (
+                <div style={{ width: '100%', maxWidth: '100%', padding: '0 1rem' }}>
                 <iframe
                     src={documentUrl}
-                    width="1700"
-                    height="950"
+                    style={{
+                    width: '100%',
+                    height: 'calc(100vh - 100px)', // Adjusts height based on viewport
+                    maxWidth: '100%',
+                    border: 'none',
+                    }}
                     title="Document Preview"
                 />
+                </div>
             )}
         </div>
+
     );
 };
 

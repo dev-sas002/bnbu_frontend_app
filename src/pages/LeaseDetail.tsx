@@ -53,8 +53,8 @@ const LeaseDetail = () => {
 
   return (
     <Layout>
-      <div className="p-4 flex-1 bg-white">
-        <div className="flex justify-between items-center mb-4">
+      <div className="p-4 flex-1 bg-white w-full mx-auto">
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
           <div>
             <h2 className="text-xl font-bold">Lease Detail</h2>
           </div>
@@ -70,44 +70,45 @@ const LeaseDetail = () => {
         <div className="mt-5">
           <p className="text-black text-left font-medium text-lg">{fullAddress}</p>
         </div>
-        
-        <table className="w-full table-auto divide-y divide-gray-200 mt-4">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">#</th>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">Date</th>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">Document Name</th>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">Status</th>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">View Document</th>
-              <th className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700">View Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents?.map((doc, index) => {
-              return (
-                <tr key={`${doc.id}-${index}`} className="hover:bg-gray-50 cursor-pointer border-b border-gray-200">
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap truncate" title={doc.name}>{doc.name}</td>
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap" title={doc.status}>{doc.status}</td>
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
-                    <button onClick={() => {
-                        console.log("Button clicked, navigating to preview");
-                        navigate(`/preview/${doc.id}`);
-                        }}>
-                        View Document
-                    </button>
-                  </td>
-                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
-                    <button onClick={() => console.log("View notes clicked")} className="text-blue-500 hover:underline">
-                      View Notes
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto divide-y divide-gray-200 mt-4">
+            <thead className="bg-gray-200 text-sm md:text-base">
+              <tr>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">#</th>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">Date</th>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">Document Name</th>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">Status</th>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">View Document</th>
+                <th className="px-4 md:px-6 py-3 text-center text-sm md:text-base font-bold uppercase text-gray-700">View Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {documents?.map((doc, index) => {
+                return (
+                  <tr key={`${doc.id}-${index}`} className="hover:bg-gray-50 cursor-pointer border-b border-gray-200">
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap truncate" title={doc.name}>{doc.name}</td>
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap" title={doc.status}>{doc.status}</td>
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">
+                      <button onClick={() => {
+                          console.log("Button clicked, navigating to preview");
+                          navigate(`/preview/${doc.id}`);
+                          }}>
+                          View Document
+                      </button>
+                    </td>
+                    <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
+                      <button onClick={() => console.log("View notes clicked")} className="text-blue-500 hover:underline">
+                        View Notes
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
         {/* Upload Revision Modal */}
         <UploadRevisionLeaseModal

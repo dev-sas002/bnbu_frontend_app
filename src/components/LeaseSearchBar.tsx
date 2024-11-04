@@ -39,16 +39,16 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
-      <div className="flex items-center gap-1">
+    <div className="bg-gray-100 p-4 rounded-lg flex flex-col md:flex-row gap-2 md:gap-4 items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-2 items-center w-full md:w-auto">
         <input
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="Address"
-          className="p-2 border rounded-lg bg-gray-50"
+          className="p-2 border rounded-lg bg-gray-50 w-full sm:w-auto"
         />
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <DatePicker
             selected={startDate}
             onChange={(date) => {
@@ -64,11 +64,11 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
             todayButton="Today"
           />
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="p-2 border rounded-lg bg-gray-50 appearance-none pr-8"
+            className="p-2 border rounded-lg bg-gray-50 w-full sm:w-auto appearance-none pr-8"
           >
             <option value="">Select Status</option>
             <option value="Draft">Draft</option>
@@ -84,11 +84,11 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
       </div>
       <button
         onClick={handleSearch}
-        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors w-full sm:w-auto"
       >
         Search
       </button>
-      {error && <div className="text-red-500 mt-2">{error}</div>} {/* Display error message */}
+      {error && <div className="text-red-500 mt-2 w-full text-center md:text-left">{error}</div>}
     </div>
   );
 };
