@@ -4,6 +4,7 @@ import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLease
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
+import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -25,6 +26,7 @@ const formatDate = (dateString: string) => {
 };
 
 const LeaseDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: lease, isLoading, isError, refetch } = useGetLeaseByIdQuery(id);
   const { data: documents, refetch: refetchDocuments } = useGetDocumentNamesByLeaseIdQuery(id);
@@ -83,17 +85,20 @@ const LeaseDetail = () => {
           <tbody>
             {documents?.map((doc, index) => {
               return (
-                <tr key={`${doc.id}-${index}`}>
-                  <td className="px-4 md:px-6 py-2">{index + 1}</td>
-                  <td className="px-4 md:px-6 py-2">{formatDate(doc.uploaded_at)}</td>
-                  <td className="px-4 md:px-6 py-2 truncate" title={doc.name}>{doc.name}</td>
-                  <td className="px-4 md:px-6 py-2 truncate" title={doc.status}>{doc.status}</td>
-                  <td className="px-4 md:px-6 py-2">
-                    <a href={`/api/documents/preview/${doc.id}`} target="_blank" rel="noopener noreferrer">
-                      View Document
-                    </a>
+                <tr key={`${doc.id}-${index}`} className="hover:bg-gray-50 cursor-pointer border-b border-gray-200">
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap truncate" title={doc.name}>{doc.name}</td>
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap" title={doc.status}>{doc.status}</td>
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
+                    <button onClick={() => {
+                        console.log("Button clicked, navigating to preview");
+                        navigate(`/preview/${doc.id}`);
+                        }}>
+                        View Document
+                    </button>
                   </td>
-                  <td className="px-4 md:px-6 py-2">
+                  <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
                     <button onClick={() => console.log("View notes clicked")} className="text-blue-500 hover:underline">
                       View Notes
                     </button>

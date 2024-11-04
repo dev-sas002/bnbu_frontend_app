@@ -5,7 +5,7 @@ import UpdatePassword from './pages/UpdatePassword';
 import PrivateRoute from './components/PrivateRoute'
 import LeaseManagement from './pages/LeaseManagement';
 import LeaseDetail from './pages/LeaseDetail';
-
+import DocumentPreview from './pages/DocumentPreview';
 import './App.css'
 
 const App: React.FC = () => {
@@ -34,6 +34,14 @@ const App: React.FC = () => {
         element={
           <PrivateRoute>
             <LeaseDetail />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/preview/:documentId"
+        element={
+          <PrivateRoute>
+            <DocumentPreview />
           </PrivateRoute>
         }
       />

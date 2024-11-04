@@ -202,9 +202,9 @@ export const api = createApi({
       query: (leaseId) => `api/documents/lease/${leaseId}/documents`,
     }),
 
-    // Preview a specific document by lease ID and version
-    previewDocument: builder.query<Blob, { leaseId: number; version: number }>({
-      query: ({ leaseId, version }) => `api/documents/preview/lease/${leaseId}/version/${version}/`,
+    // Preview a specific document by document ID
+    previewDocument: builder.query<Blob, { documentId: number }>({
+      query: ({ documentId }) => `api/documents/preview/${documentId}/`,
       transformResponse: (response: Blob) => response, // Assuming the server responds with a Blob
     }),
 
