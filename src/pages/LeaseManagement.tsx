@@ -1,3 +1,4 @@
+// /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/pages/LeaseManagement.tsx
 import React, { useState } from 'react';
 import LeaseTable from '../components/LeaseTable';
 import LeaseSearchBar from '../components/LeaseSearchBar';

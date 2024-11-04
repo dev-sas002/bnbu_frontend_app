@@ -3,19 +3,38 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 interface LeaseSearchBarProps {
-  onSearch: (filters: any) => void;
+  onSearch: (filters: LeaseSearchFilters) => void;
+}
+
+interface LeaseSearchFilters {
+  address: string;
+  status: string;
+  startDate?: string; // ISO string format
+  endDate?: string;   // ISO string format
 }
 
 const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
   const [address, setAddress] = useState('');
   const [status, setStatus] = useState('');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = () => {
+    // Validate date range
+    if (startDate && endDate && startDate > endDate) {
+      setError('Start date must be before end date.');
+      return;
+    } else {
+      setError(null); // Clear any previous error
+    }
+  
     const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : undefined;
-    const formattedEndDate = endDate ? endDate.toISOString().split('T')[0] : undefined;
-    
+  
+    // Ensure that the end date includes the full day
+    const formattedEndDate = endDate 
+      ? new Date(endDate.getTime() + 86399999).toISOString().split('T')[0] // Adding 23 hours, 59 minutes, 59 seconds
+      : undefined;
     onSearch({ address, status, startDate: formattedStartDate, endDate: formattedEndDate });
   };
 
@@ -32,13 +51,13 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
         <div className="relative">
           <DatePicker
             selected={startDate}
-            onChange={(dates) => {
-              const [start, end] = dates;
-              setStartDate(start || undefined);
-              setEndDate(end || undefined);
+            onChange={(date) => {
+              const [start, end] = date;
+              setStartDate(start);
+              setEndDate(end);
             }}
-            startDate={startDate}
-            endDate={endDate}
+            startDate={startDate as Date}
+            endDate={endDate as Date}
             selectsRange
             placeholderText="Select Date Range"
             className="w-full p-2 border rounded-lg bg-gray-50"
@@ -49,14 +68,14 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="p-2 border rounded-lg bg-gray-50 appearance-none pr-8" // Added padding to the right for the dropdown arrow
+            className="p-2 border rounded-lg bg-gray-50 appearance-none pr-8"
           >
             <option value="">Select Status</option>
             <option value="Draft">Draft</option>
             <option value="Rejected">Rejected</option>
             <option value="Approved">Approved</option>
           </select>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"> {/* Custom caret icon */}
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
@@ -69,6 +88,7 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
       >
         Search
       </button>
+      {error && <div className="text-red-500 mt-2">{error}</div>} {/* Display error message */}
     </div>
   );
 };

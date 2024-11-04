@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import LeaseRow from './LeaseRow';
 import { Lease } from '../types/leaseTypes';
 import UploadLeaseModal from './UploadLeaseModal';
+import UploadRevisionLeaseModal from './UploadRevisionLeaseModal';
 
 interface LeaseTableProps {
   leases: Lease[];
   onUpdate: (leaseData: Lease) => void;
+  onUpdateRevision: (formData: FormData) => Promise<void>;
 }
 
-const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
+const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate, onUpdateRevision }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isUploadRevisionModalOpen, setIsUploadRevisionModalOpen] = useState(false);
   const [selectedLease, setSelectedLease] = useState<Lease | null>(null);
 
   const handleEditClick = (lease: Lease) => {
@@ -17,8 +20,18 @@ const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
     setIsEditModalOpen(true);
   };
 
+  const handleUploadRevisionClick = (lease: Lease) => {
+    setSelectedLease(lease);
+    setIsUploadRevisionModalOpen(true);
+  };
+
   const closeEditModal = () => {
     setIsEditModalOpen(false);
+    setSelectedLease(null);
+  };
+
+  const closeUploadRevisionModal = () => {
+    setIsUploadRevisionModalOpen(false);
     setSelectedLease(null);
   };
 
@@ -30,7 +43,7 @@ const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
             {["#", "Date", "Address", "City", "State", "Zip", "# of Docs", "Status", "Edit"].map((header, idx) => (
               <th
                 key={idx}
-                className="px-4 md:px-6 py-3 text-left text-xs font-bold uppercase text-gray-700"
+                className="px-4 md:px-6 py-3 text-center text-xs font-bold uppercase text-gray-700"
               >
                 {header}
               </th>
@@ -45,11 +58,12 @@ const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
                 lease={lease}
                 index={index + 1}
                 onEditClick={handleEditClick}
+                onUploadRevisionClick={handleUploadRevisionClick} // Add this line to handle upload revision click
               />
             ))
           ) : (
             <tr>
-              <td colSpan={9} className="px-4 py-4 text-center text-gray-500">
+              <td colSpan={10} className="px-4 py-4 text-center text-gray-500">
                 No leases available
               </td>
             </tr>
@@ -57,7 +71,7 @@ const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
         </tbody>
       </table>
 
-      {/* Render modal for editing */}
+      {/* Render modals */}
       <UploadLeaseModal
         isOpen={isEditModalOpen}
         onClose={closeEditModal}
@@ -65,6 +79,13 @@ const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate }) => {
         leaseData={selectedLease}
         isEditMode={true} // Set to true for editing
         onUpdate={onUpdate}
+      />
+
+      <UploadRevisionLeaseModal
+        isOpen={isUploadRevisionModalOpen}
+        onClose={closeUploadRevisionModal}
+        leaseData={selectedLease}
+        onUpdateRevision={onUpdateRevision}
       />
     </div>
   );

@@ -2,14 +2,18 @@
 import React from 'react';
 import { Lease } from '../types/leaseTypes';
 import { PencilIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 
 interface LeaseRowProps {
   lease: Lease;
   index: number;
   onEditClick: (lease: Lease) => void;
+  onUploadRevisionClick: (lease: Lease) => void;
 }
 
 const LeaseRow: React.FC<LeaseRowProps> = ({ lease, index, onEditClick }) => {
+  const navigate = useNavigate();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Draft':
@@ -25,9 +29,12 @@ const LeaseRow: React.FC<LeaseRowProps> = ({ lease, index, onEditClick }) => {
 
   //console.log("LeaseRow props:", lease);
 
+  const handleRowClick = () => {
+    navigate(`/lease/${lease.id}`);
+  };
 
   return (
-    <tr className="hover:bg-gray-50 cursor-pointer">
+    <tr onClick={handleRowClick} className="hover:bg-gray-50 cursor-pointer">
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{lease.date}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{lease.address1 + ' ' + lease.address2}</td>
@@ -39,7 +46,7 @@ const LeaseRow: React.FC<LeaseRowProps> = ({ lease, index, onEditClick }) => {
         {lease.status}
       </td>
       <td className="px-4 md:px-6 py-2 whitespace-nowrap">
-        <button onClick={() => onEditClick(lease)} className="text-indigo-600 hover:text-indigo-900">
+        <button onClick={(e) => { e.stopPropagation(); onEditClick(lease); }} className="text-indigo-600 hover:text-indigo-900">
           <PencilIcon className="h-5 w-5" />
         </button>
       </td>

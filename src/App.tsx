@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import UpdatePassword from './pages/UpdatePassword';
 import PrivateRoute from './components/PrivateRoute'
 import LeaseManagement from './pages/LeaseManagement';
+import LeaseDetail from './pages/LeaseDetail';
 
 import './App.css'
 
@@ -25,6 +26,14 @@ const App: React.FC = () => {
         element={
           <PrivateRoute>
             <LeaseManagement />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/lease/:id"
+        element={
+          <PrivateRoute>
+            <LeaseDetail />
           </PrivateRoute>
         }
       />

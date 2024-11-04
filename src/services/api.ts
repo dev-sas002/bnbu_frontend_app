@@ -191,6 +191,23 @@ export const api = createApi({
         method: 'DELETE',
       }),
     }),
+
+    // Fetch documents with pagination
+    getDocuments: builder.query({
+      query: (page = 1) => `api/documents/?page=${page}`, // Include page number in query
+    }),
+
+    // Fetch document names by lease ID
+    getDocumentNamesByLeaseId: builder.query({
+      query: (leaseId) => `api/documents/lease/${leaseId}/documents`,
+    }),
+
+    // Preview a specific document by lease ID and version
+    previewDocument: builder.query<Blob, { leaseId: number; version: number }>({
+      query: ({ leaseId, version }) => `api/documents/preview/lease/${leaseId}/version/${version}/`,
+      transformResponse: (response: Blob) => response, // Assuming the server responds with a Blob
+    }),
+
   }),
 })
 
@@ -214,4 +231,7 @@ export const {
   useReviseLeaseMutation,
   useUpdateLeaseMutation, 
   useDeleteLeaseMutation,
+  useGetDocumentsQuery,
+  useGetDocumentNamesByLeaseIdQuery,
+  usePreviewDocumentQuery,
 } = api
