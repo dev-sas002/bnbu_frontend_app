@@ -208,6 +208,11 @@ export const api = createApi({
       transformResponse: (response: Blob) => response, // Assuming the server responds with a Blob
     }),
 
+    // Fetch a specific document by document ID
+    getDocumentById: builder.query({
+      query: (documentId) => `api/documents/${documentId}/`,
+    }),
+
   }),
 })
 
@@ -234,4 +239,5 @@ export const {
   useGetDocumentsQuery,
   useGetDocumentNamesByLeaseIdQuery,
   usePreviewDocumentQuery,
+  useGetDocumentByIdQuery,
 } = api

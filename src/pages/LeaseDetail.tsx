@@ -94,12 +94,12 @@ const LeaseDetail = () => {
                       <button onClick={() => {
                           console.log("Button clicked, navigating to preview");
                           navigate(`/preview/${doc.id}`);
-                          }}>
+                          }} className="text-red-500 hover:underline">
                           View Document
                       </button>
                     </td>
                     <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
-                      <button onClick={() => console.log("View notes clicked")} className="text-blue-500 hover:underline">
+                      <button onClick={() => navigate(`/lease/${lease.id}/documents/${doc.id}/notes`)} className="text-red-500 hover:underline">
                         View Notes
                       </button>
                     </td>

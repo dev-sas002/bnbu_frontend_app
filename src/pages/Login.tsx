@@ -71,7 +71,7 @@ const Login: React.FC = () => {
         localStorage.removeItem('email');
         localStorage.removeItem('password');
       }
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setEmailError('Failed to log in');
       setPasswordError('Please check your credentials and try again');

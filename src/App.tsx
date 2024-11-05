@@ -6,14 +6,16 @@ import PrivateRoute from './components/PrivateRoute'
 import LeaseManagement from './pages/LeaseManagement';
 import LeaseDetail from './pages/LeaseDetail';
 import DocumentPreview from './pages/DocumentPreview';
+import ViewNotes from './pages/ViewNotes'
 import './App.css'
+import Layout from './components/Layout';
 
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <PrivateRoute>
             <Dashboard />
@@ -41,9 +43,27 @@ const App: React.FC = () => {
         path="/preview/:documentId"
         element={
           <PrivateRoute>
+            <Layout>
             <DocumentPreview />
+            </Layout>
           </PrivateRoute>
         }
+      />
+      <Route
+        path="/lease/:id/documents/:documentId/notes"  // Updated route for ViewNotes using documentId
+        element={
+          <PrivateRoute>
+            <ViewNotes />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/regulations"
+        // element={
+        //   <PrivateRoute>
+        //     <Regulations />
+        //   </PrivateRoute>
+        // }
       />
     </Routes>
   )
