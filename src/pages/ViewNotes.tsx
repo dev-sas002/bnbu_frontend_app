@@ -59,11 +59,17 @@ const ViewNotes = () => {
             <p>
               Status:{" "}
               <span
-                className={`bg-${lease.status === "Active" ? "green" : "red"}-300 text-${
-                  lease.status === "Active" ? "green" : "red"
-                }-800 px-2 py-1 rounded`}
+                className={`${
+                  currentDocument?.status === "Draft"
+                    ? "bg-yellow-300 text-yellow-800"
+                    : currentDocument?.status === "Rejected"
+                    ? "bg-red-300 text-red-800"
+                    : currentDocument?.status === "Approved"
+                    ? "bg-green-300 text-green-800"
+                    : "bg-gray-300 text-gray-800"
+                } px-2 py-1 rounded`}
               >
-                {lease.status || "No status available"}
+                {currentDocument?.status || "No status available"}
               </span>
             </p>
           </div>
