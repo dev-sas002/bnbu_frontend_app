@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import LeaseTable from '../components/LeaseTable';
 import LeaseSearchBar from '../components/LeaseSearchBar';
 import UploadLeaseModal from '../components/UploadLeaseModal';
-import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery } from '../services/api';
+import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery, useReviewDocumentsMutation } from '../services/api';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 import { set } from 'react-datepicker/dist/date_utils';
@@ -14,6 +14,7 @@ const LeaseManagement = () => {
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadLease] = useUploadLeaseMutation();
   const [updateLease] = useUpdateLeaseMutation();
+  const [reviewDocuments] = useReviewDocumentsMutation(); 
   const [searchFilters, setSearchFilters] = useState({
     address: '',
     status: '',
@@ -44,9 +45,24 @@ const LeaseManagement = () => {
 
   const handleUploadLease = async (leaseData: FormData) => {
     try {
-      await uploadLease(leaseData).unwrap();
+      // Upload the lease
+      const uploadedLease = await uploadLease(leaseData).unwrap();
       refetch();
       setUploadModalOpen(false);
+
+    if (uploadedLease.documents && uploadedLease.documents.length > 0) {
+      const documentIds = uploadedLease.documents.map(doc => doc.id).filter(id => id); // Collect document IDs
+
+      try {
+        // Review all documents at once using the reviewDocuments mutation
+        await reviewDocuments({ documentIds });
+        console.log(`All documents reviewed.`);
+      } catch (reviewError) {
+        console.error(`Error reviewing documents:`, reviewError);
+        alert('Failed to review documents');
+      }
+    }
+    
     } catch (error) {
       console.error("Failed to upload lease:", error);
     }

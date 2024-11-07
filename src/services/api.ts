@@ -213,6 +213,26 @@ export const api = createApi({
       query: (documentId) => `api/documents/${documentId}/`,
     }),
 
+    // Review multiple documents by document IDs
+    reviewDocuments: builder.mutation({
+      query: ({ documentIds }) => ({
+        url: 'api/documents/review/',  // Updated endpoint for batch document review action
+        method: 'POST',
+        body: { document_ids: documentIds }  // Send the document IDs as part of the request body
+      }),
+    }),
+
+
+    // Chat with GPT about a specific document by document ID
+    chatWithGpt: builder.mutation({
+      query: ({ documentId, message }) => ({
+        url: `api/documents/${documentId}/chat/`,  // Endpoint for chat action
+        method: 'POST',
+        body: { message },
+      }),
+    }),
+
+
   }),
 })
 
@@ -240,4 +260,6 @@ export const {
   useGetDocumentNamesByLeaseIdQuery,
   usePreviewDocumentQuery,
   useGetDocumentByIdQuery,
+  useReviewDocumentsMutation,
+  useChatWithGptMutation,
 } = api
