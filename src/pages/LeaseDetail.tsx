@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLeaseMutation, useReviewDocumentsMutation } from '../services/api';
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
-import { useNavigate } from 'react-router-dom';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -29,11 +28,17 @@ const LeaseDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data: lease, isLoading, isError, refetch } = useGetLeaseByIdQuery(id);
-  const { data: documents, refetch: refetchDocuments } = useGetDocumentNamesByLeaseIdQuery(id);
+  const { data: documents, refetch: refetchDocuments,isFetching: isDocumentsFetching,} = useGetDocumentNamesByLeaseIdQuery(id, { skip: !id });
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [reviseLease] = useReviseLeaseMutation();
   // Initialize the reviewDocuments mutation
   const [reviewDocuments] = useReviewDocumentsMutation();
+
+  // Fetch documents only when necessary
+  useEffect(() => {
+    if (id) refetchDocuments();
+  }, [id, refetchDocuments]);
+
   // Update the upload logic in LeaseDetail to convert Lease to FormData
   const handleUploadRevision = async (formData: FormData) => {
     try {
@@ -97,7 +102,10 @@ const LeaseDetail = () => {
         <div className="mt-5">
           <p className="text-black text-left font-medium text-lg">{fullAddress}</p>
         </div>
-        <div className="overflow-x-auto">
+      {isDocumentsFetching ? (
+          <div>Loading documents...</div>
+        ) : (
+        <div className="overflow-x-auto mt-4">
           <table className="w-full table-auto divide-y divide-gray-200 mt-4">
             <thead className="bg-gray-200 text-sm md:text-base">
               <tr>
@@ -110,8 +118,7 @@ const LeaseDetail = () => {
               </tr>
             </thead>
             <tbody>
-              {documents?.map((doc, index) => {
-                return (
+              {documents?.map((doc, index) => (
                   <tr key={`${doc.id}-${index}`} className="hover:bg-gray-50 cursor-pointer border-b border-gray-200">
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>
@@ -131,13 +138,12 @@ const LeaseDetail = () => {
                       </button>
                     </td>
                   </tr>
-                );
-              })}
+                ))}
             </tbody>
           </table>
         </div>
+      )}
 
-        {/* Upload Revision Modal */}
         <UploadRevisionLeaseModal
           isOpen={isUploadModalOpen}
           onClose={() => setUploadModalOpen(false)}
