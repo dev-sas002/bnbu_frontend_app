@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLeaseMutation } from '../services/api';
+import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLeaseMutation, useReviewDocumentsMutation } from '../services/api';
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
@@ -32,14 +32,41 @@ const LeaseDetail = () => {
   const { data: documents, refetch: refetchDocuments } = useGetDocumentNamesByLeaseIdQuery(id);
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [reviseLease] = useReviseLeaseMutation();
+  // Initialize the reviewDocuments mutation
+  const [reviewDocuments] = useReviewDocumentsMutation();
   // Update the upload logic in LeaseDetail to convert Lease to FormData
   const handleUploadRevision = async (formData: FormData) => {
     try {
       console.log("FormData being sent:", Array.from(formData.entries()));
-      await reviseLease({ id, revisedData: formData }).unwrap();
+      
+      // Store the timestamp of the latest document before the revision upload
+      const lastUploadedAt = documents?.length > 0 ? new Date(documents[documents.length - 1].uploaded_at).getTime() : 0;
+  
+      // Start uploading the revision
+      const uploadedLeaseStatus = await reviseLease({ id, revisedData: formData }).unwrap();
+      console.log("Uploaded Lease Status:", uploadedLeaseStatus);
+  
       setUploadModalOpen(false);
-      refetch();
-      refetchDocuments();
+      refetch();  // Fetch the updated lease data
+      await refetchDocuments();
+    
+      const documentIds = uploadedLeaseStatus.document_ids;
+
+        if (documentIds && documentIds.length > 0) {
+          try {
+            await reviewDocuments({ documentIds });
+            refetch();  // Fetch the updated lease data
+            await refetchDocuments();
+            console.log(`New documents reviewed.`);
+          } catch (reviewError) {
+            console.error(`Error reviewing documents:`, reviewError);
+            alert('Failed to review documents');
+          }
+        }
+       else {
+        console.warn("No documents found after revision upload");
+      }
+  
     } catch (error) {
       console.error("Failed to upload revision:", error);
     }

@@ -41,8 +41,10 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
       formData.append('leaseId', leaseData?.id.toString() || '');
   
       // Pass the formData to onUpdate
-      await onUpdateRevision(formData); // <-- Updated to use formData
+      const res = await onUpdateRevision(formData); 
       alert('Lease revision uploaded successfully!');
+      console.log(res);
+      
       onClose();
     } catch (error) {
       console.error('Failed to upload revision:', error);

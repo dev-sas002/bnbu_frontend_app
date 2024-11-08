@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetDocumentByIdQuery, useGetLeaseByIdQuery, useReviseLeaseMutation } from '../services/api';
+import { useGetDocumentByIdQuery, useGetLeaseByIdQuery, useReviseLeaseMutation, useReviewDocumentsMutation } from '../services/api';
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import ChatBox from '../components/ChatBox';
@@ -16,12 +16,27 @@ const ViewNotes = () => {
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [reviseLease] = useReviseLeaseMutation();
 
-  const handleUploadRevision = async (formData : FormData) => {
+  // Initialize the reviewDocuments mutation
+  const [reviewDocuments] = useReviewDocumentsMutation();
+
+  const handleUploadRevision = async (formData: FormData) => {
     try {
       console.log("FormData being sent:", Array.from(formData.entries()));
-      await reviseLease({ id, revisedData: formData }).unwrap(); // Use documentId for revision
+      const uploadedLeaseStatus = await reviseLease({ id, revisedData: formData }).unwrap();
       setUploadModalOpen(false);
       refetch();
+
+      const documentIds = uploadedLeaseStatus.document_ids;
+
+      if (documentIds && documentIds.length > 0) {
+        try {
+          await reviewDocuments({ documentIds });
+          console.log("Documents reviewed successfully.");
+        } catch (reviewError) {
+          console.error("Error reviewing documents:", reviewError);
+          alert('Failed to review documents');
+        }
+      }
     } catch (error) {
       console.error("Failed to upload revision:", error);
     }
@@ -90,7 +105,7 @@ const ViewNotes = () => {
         </div>
     </Layout>
   );
-    
+
 };
 
 export default ViewNotes;
