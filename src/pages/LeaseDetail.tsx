@@ -6,6 +6,8 @@ import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 import { RootState } from '@/store';
 import { useSelector } from 'react-redux';
+import { toggleRefreshDocuments } from '../store/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -36,7 +38,7 @@ const LeaseDetail = () => {
   // Initialize the reviewDocuments mutation
   const [reviewDocuments] = useReviewDocumentsMutation();
   const toggle = useSelector((state: RootState) => state.auth.refreshDocuments);
-
+  const dispatch = useDispatch()
   // Fetch documents only when necessary
   useEffect(() => {
     if (id) refetchDocuments();
@@ -63,8 +65,7 @@ const LeaseDetail = () => {
         if (documentIds && documentIds.length > 0) {
           try {
             await reviewDocuments({ documentIds });
-            refetch();  // Fetch the updated lease data
-            await refetchDocuments();
+            dispatch(toggleRefreshDocuments())
             console.log(`New documents reviewed.`);
           } catch (reviewError) {
             console.error(`Error reviewing documents:`, reviewError);
