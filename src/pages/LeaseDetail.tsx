@@ -123,7 +123,19 @@ const LeaseDetail = () => {
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap truncate" title={doc.name}>{doc.name}</td>
-                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap" title={doc.status}>{doc.status}</td>
+                    <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">
+                      <span
+                        title={doc.status}
+                        className={`px-2 py-1 rounded ${
+                          doc.status === "Draft" ? "bg-yellow-300 text-yellow-800" 
+                          : doc.status === "Rejected" ? "bg-red-300 text-red-800" 
+                          : doc.status === "Approved" ? "bg-green-300 text-green-800" 
+                          : "bg-gray-300 text-gray-800"
+                        }`}
+                      >
+                        {doc.status}
+                      </span>
+                    </td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">
                       <button onClick={() => {
                           console.log("Button clicked, navigating to preview");
