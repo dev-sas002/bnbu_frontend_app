@@ -7,6 +7,8 @@ import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, u
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 import { set } from 'react-datepicker/dist/date_utils';
+import { toggleRefreshDocuments } from '../store/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -42,6 +44,7 @@ const LeaseManagement = () => {
   // console.log("Current page:", page);
   // console.log("Final search query:", isFilterApplied() ? { ...searchFilters, ...(page ? { page } : {}) } : undefined);
 
+  const dispatch = useDispatch()
 
   const handleUploadLease = async (leaseData: FormData) => {
     try {
@@ -56,6 +59,7 @@ const LeaseManagement = () => {
       try {
         // Review all documents at once using the reviewDocuments mutation
         await reviewDocuments({ documentIds });
+        dispatch(toggleRefreshDocuments()) 
         console.log(`All documents reviewed.`);
       } catch (reviewError) {
         console.error(`Error reviewing documents:`, reviewError);

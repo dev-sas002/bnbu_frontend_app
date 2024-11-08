@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './Modal';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
-import { useReviewDocumentsMutation } from '../services/api'; 
 
 interface UploadLeaseModalProps {
   isOpen: boolean;
@@ -28,9 +27,6 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
   const [city, setCity] = useState('');
   const [zip, setZip] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-
-  // Use the mutation hook for reviewing documents
-  const [reviewDocuments] = useReviewDocumentsMutation();
 
   useEffect(() => {
     if (leaseData) {
@@ -97,21 +93,6 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
         await onUpload(formData);
         alert('Lease uploaded successfully!');
       }
-
-      // Review all documents after upload
-      if (leaseData?.documents && leaseData.documents.length > 0) {
-        const documentIds = leaseData.documents.map(doc => doc.id).filter(id => id); // Collect document IDs
-
-        try {
-          // Review all documents at once using the reviewDocuments mutation
-          await reviewDocuments({ documentIds });
-          console.log(`All documents reviewed.`);
-        } catch (reviewError) {
-          console.error(`Error reviewing documents:`, reviewError);
-          alert('Failed to review documents');
-        }
-      }
-      
       onClose();
     } catch (error) {
       console.error('Failed to upload/update lease:', error);
