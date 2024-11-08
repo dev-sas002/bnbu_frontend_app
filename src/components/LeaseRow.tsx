@@ -14,20 +14,6 @@ interface LeaseRowProps {
 const LeaseRow: React.FC<LeaseRowProps> = ({ lease, index, onEditClick }) => {
   const navigate = useNavigate();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Draft':
-        return 'text-gray-600';
-      case 'Rejected':
-        return 'text-red-600';
-      case 'Approved':
-        return 'text-green-600';
-      default:
-        return 'text-black';
-    }
-  };
-
-  //console.log("LeaseRow props:", lease);
 
   const handleRowClick = () => {
     navigate(`/lease/${lease.id}`);
@@ -42,8 +28,18 @@ const LeaseRow: React.FC<LeaseRowProps> = ({ lease, index, onEditClick }) => {
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{lease.state}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{lease.zip_code}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{lease.num_of_docs}</td>
-      <td className={`px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap ${getStatusColor(lease.status)}`}>
-        {lease.status}
+      <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
+        <span
+          title={lease.status}
+          className={`px-2 py-1 rounded ${
+            lease.status === "Draft" ? "bg-yellow-300 text-yellow-800" 
+            : lease.status === "Rejected" ? "bg-red-300 text-red-800" 
+            : lease.status === "Approved" ? "bg-green-300 text-green-800" 
+            : "bg-gray-300 text-gray-800"
+          }`}
+        >
+          {lease.status}
+        </span>
       </td>
       <td className="px-4 md:px-6 py-2 whitespace-nowrap">
         <button onClick={(e) => { e.stopPropagation(); onEditClick(lease); }} className="text-indigo-600 hover:text-indigo-900">
