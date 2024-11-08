@@ -4,6 +4,8 @@ import { useGetDocumentByIdQuery, useGetLeaseByIdQuery, useReviseLeaseMutation, 
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import ChatBox from '../components/ChatBox';
+import { toggleRefreshDocuments } from '../store/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const ViewNotes = () => {
   // const { documentId } = useParams(); 
@@ -15,6 +17,7 @@ const ViewNotes = () => {
   const { data: document, isLoading, isError, refetch } = useGetDocumentByIdQuery(documentId); // Fetch document-specific data
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [reviseLease] = useReviseLeaseMutation();
+  const dispatch = useDispatch()
 
   // Initialize the reviewDocuments mutation
   const [reviewDocuments] = useReviewDocumentsMutation();
@@ -31,6 +34,7 @@ const ViewNotes = () => {
       if (documentIds && documentIds.length > 0) {
         try {
           await reviewDocuments({ documentIds });
+          dispatch(toggleRefreshDocuments())  
           console.log("Documents reviewed successfully.");
         } catch (reviewError) {
           console.error("Error reviewing documents:", reviewError);

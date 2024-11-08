@@ -4,6 +4,8 @@ import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLease
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
+import { RootState } from '@/store';
+import { useSelector } from 'react-redux';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -33,11 +35,12 @@ const LeaseDetail = () => {
   const [reviseLease] = useReviseLeaseMutation();
   // Initialize the reviewDocuments mutation
   const [reviewDocuments] = useReviewDocumentsMutation();
+  const toggle = useSelector((state: RootState) => state.auth.refreshDocuments);
 
   // Fetch documents only when necessary
   useEffect(() => {
     if (id) refetchDocuments();
-  }, [id, refetchDocuments]);
+  }, [id, refetchDocuments, toggle]);
 
   // Update the upload logic in LeaseDetail to convert Lease to FormData
   const handleUploadRevision = async (formData: FormData) => {
