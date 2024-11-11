@@ -104,23 +104,24 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId }) => {
   }
 
   return (
-    <div className="chat-box border p-4 rounded shadow-md bg-white">
-      <h3 className="text-lg font-semibold mb-2">Chat</h3>
+    <div className="chat-box border p-4 rounded shadow-md bg-white mx-auto">
       {summary && (
-        <div className="mb-4 p-3 bg-yellow-100 border rounded">
-          <strong>Summary:</strong> {summary}
+        <div className="mb-6 p-4 items-center justify-center  bg-yellow-100 border-l-4 border-yellow-500 rounded">
+          <strong>Initial Analysis</strong> 
+          <p>{summary}</p>
         </div>
       )}
-      <div className="chat-messages overflow-y-auto h-64 mb-3 border p-2 rounded bg-gray-100">
+      <h3 className="text-lg font-bold text-red-600 mb-4">Chat with LeaseGuard AI</h3>
+      <div className="chat-messages overflow-y-auto h-72 mb-6 border p-4 rounded bg-gray-50 shadow-inner">
         {messages.map((message, index) => (
           <div key={index} className={`mb-2 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block p-2 rounded ${message.sender === 'user' ? 'bg-blue-200' : 'bg-gray-200'}`}>
+            <div className={`inline-block p-3 rounded max-w-4xl ${message.sender === 'user' ? 'bg-red-200 text-red-900' : 'bg-gray-200 text-gray-800'}`}>
               <div>{message.text}</div>
               <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
             </div>
           </div>
         ))}
-        {isGPTTyping && <div className="text-gray-500">typing...</div>}
+        {isGPTTyping && <div className="text-gray-500 italic">LeaseGuard AI is typing...</div>}
         <div ref={messagesEndRef} />
       </div>
       <div className="flex items-center">
@@ -128,13 +129,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId }) => {
           type="text"
           value={input}
           onChange={handleInputChange}
-          className="border p-2 flex-grow rounded"
-          placeholder="Type your message..."
+          className="border p-3 flex-grow rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+          placeholder="Type your message to send it to LeaseGuard AI..."
         />
         <button
           onClick={handleSendMessage}
           disabled={isSendingMessage || !input.trim()}
-          className="ml-2 p-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          className="ml-2 p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Send
         </button>
