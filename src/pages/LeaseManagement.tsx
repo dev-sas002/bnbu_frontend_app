@@ -1,5 +1,5 @@
 // /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/pages/LeaseManagement.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LeaseTable from '../components/LeaseTable';
 import LeaseSearchBar from '../components/LeaseSearchBar';
 import UploadLeaseModal from '../components/UploadLeaseModal';
@@ -8,7 +8,8 @@ import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 import { set } from 'react-datepicker/dist/date_utils';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -33,6 +34,10 @@ const LeaseManagement = () => {
     isFilterApplied() ? { ...searchFilters, ...(page ? { page } : {}) } : undefined
   );
   
+  const toggle = useSelector((state: RootState) => state.auth.refreshDocuments);
+  useEffect(() => {
+    refetch();
+  }, [toggle])
 
   const displayedLeases =  isFilterApplied() ? searchResults?.results : leases?.results;
   // console.log("displayedLeases:", displayedLeases);
