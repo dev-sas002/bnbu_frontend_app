@@ -224,13 +224,46 @@ export const api = createApi({
 
 
     // Chat with GPT about a specific document by document ID
+    // chatWithGpt: builder.mutation({
+    //   query: ({ documentId, message }) => ({
+    //     url: `api/documents/${documentId}/chat/`,  // Endpoint for chat action
+    //     method: 'POST',
+    //     body: { message },
+    //   }),
+    // }),
+
+    // Chat with GPT about a specific document by document ID
+    // chatWithGpt: builder.mutation({
+    //   query: ({ documentId, message }) => ({
+    //     url: `api/documents/${documentId}/chat/`, // Endpoint for chat action
+    //     method: 'POST',
+    //     body: { message },
+    //   }),
+    // }),
+
+    // Chat with GPT about a specific document by document ID
     chatWithGpt: builder.mutation({
       query: ({ documentId, message }) => ({
-        url: `api/documents/${documentId}/chat/`,  // Endpoint for chat action
+        url: `/api/documents/${documentId}/chat/`, // Endpoint for chat action
         method: 'POST',
-        body: { message },
+        body: { document_id: documentId, message },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }),
     }),
+
+    // Chat history for a specific document by document ID
+    getChatHistory: builder.query({
+      query: (documentId) => ({
+        url: `/api/documents/${documentId}/get-chat-history/`, // Endpoint for chat history
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+
 
 
   }),
@@ -262,4 +295,5 @@ export const {
   useGetDocumentByIdQuery,
   useReviewDocumentsMutation,
   useChatWithGptMutation,
+  useGetChatHistoryQuery,
 } = api
