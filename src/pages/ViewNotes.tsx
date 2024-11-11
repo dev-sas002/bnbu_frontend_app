@@ -110,7 +110,7 @@ const ViewNotes = () => {
       {/* Chat Box Component */}
       <div className="w-full mt-6">
         <div className="w-full max-w-5xl mx-auto">
-          <ChatBox documentId={documentId} />
+          <ChatBox documentId={documentId} lease={lease} />
         </div>
       </div>
     </Layout>

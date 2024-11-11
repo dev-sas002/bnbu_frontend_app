@@ -29,7 +29,7 @@ const LeaseSearchBar: React.FC<LeaseSearchBarProps> = ({ onSearch }) => {
       setError(null); // Clear any previous error
     }
   
-    const formattedStartDate = startDate ? startDate.toISOString().split('T')[0] : undefined;
+    const formattedStartDate = startDate ? new Date(startDate.getTime() + 86399999).toISOString().split('T')[0] : undefined;
   
     // Ensure that the end date includes the full day
     const formattedEndDate = endDate 

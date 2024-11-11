@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useChatWithGptMutation, useGetChatHistoryQuery } from '../services/api';
 import dayjs from 'dayjs';
+import { Lease } from '@/types/leaseTypes';
 
 interface Message {
   text: string;
@@ -10,9 +11,10 @@ interface Message {
 
 interface ChatBoxProps {
   documentId: string | undefined;
+  lease: Lease | null;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ documentId }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [summary, setSummary] = useState<string | null>(null);
@@ -61,7 +63,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId }) => {
         setMessages((prevMessages) => [...prevMessages, systemResponse]);
 
         // Update summary if available
-        if (summary === null && response.summary) {
+        if (!summary && response.summary) {
           setSummary(response.summary);
         }
       } catch (err) {
@@ -87,12 +89,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId }) => {
 
   // Fetch chat history on load or when data changes
   useEffect(() => {
+    refetch();
     if (data?.chat_history) {
       setMessages(mapChatHistory(data.chat_history));
-      setSummary(data.gpt_response?.message || null);
+
+      // Update the summary if it's available and different from the current one
+    if (data.gpt_response?.message && data.gpt_response.message !== summary) {
+      setSummary(data.gpt_response.message);
+    }
+
+      // Scroll to the bottom after messages are updated
       scrollToBottom();
     }
-  }, [data]);
+  }, [data, data?.gpt_response?.message, summary, documentId, lease]);
 
   // Scroll to bottom whenever messages change
   useEffect(() => {

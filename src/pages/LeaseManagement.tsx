@@ -26,7 +26,7 @@ const LeaseManagement = () => {
   });
 
   const isFilterApplied = () => {
-    return searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate;
+    return !!(searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate);
   };
 
   // const { data: searchResults } = useSearchLeasesQuery(searchFilters.address || searchFilters.status || searchFilters.startDate || searchFilters.endDate ? {...searchFilters, "page" : page} : undefined );
@@ -47,7 +47,7 @@ const LeaseManagement = () => {
   // console.log("================>")
   // console.log("Search filters:", searchFilters);
   // console.log("Current page:", page);
-  // console.log("Final search query:", isFilterApplied() ? { ...searchFilters, ...(page ? { page } : {}) } : undefined);
+  // console.log("Final search query:", isFilterApplied());
 
   const dispatch = useDispatch()
 
@@ -93,7 +93,6 @@ const LeaseManagement = () => {
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    refetch();
   };
 
   if (isLoading) {

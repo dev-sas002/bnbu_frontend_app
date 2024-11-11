@@ -38,7 +38,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
       setIsUploading(true);
       const formData = new FormData();
       files.forEach(file => formData.append('documents', file)); // Append all selected files
-      formData.append('leaseId', leaseData?.id.toString() || '');
+      formData.append('leaseId', leaseData?.id ? leaseData.id.toString() : '');
   
       // Pass the formData to onUpdate
       const res = await onUpdateRevision(formData); 
