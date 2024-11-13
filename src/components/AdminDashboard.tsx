@@ -29,7 +29,7 @@ const AdminDashboard: React.FC = () => {
     }
   }, [users]);
 
-  const handleCreateUser = async (userData) => {
+  const handleCreateUser = async (userData : User ) => {
     try {
       await createUser(userData).unwrap();
       toast.success('User created successfully');
@@ -41,9 +41,9 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateUser = async (userData) => {
+  const handleUpdateUser = async (userData : User ) => {
     try {
-      await updateUser({ id: userData.id, ...userData }).unwrap();
+      await updateUser({...userData, id: userData.id }).unwrap();
       toast.success('User updated successfully');
       refetch(); // Refetch the users after updating a user
       setSelectedUser(null);
@@ -53,7 +53,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (id : number) => {
     try {
       await deleteUser(id).unwrap();
       toast.success('User deleted successfully');

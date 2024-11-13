@@ -36,7 +36,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
       onClose(); // Close the modal automatically
     } catch (err) {
       console.error('Error changing password:', err);
-      setError(err.data?.old_password || "An error occurred.");
+      setError("An error occurred.");
       setSuccess(null);
     }
   };

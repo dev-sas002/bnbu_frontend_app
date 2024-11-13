@@ -1,12 +1,13 @@
 // /Users/dev/Documents/bnbu-frontend-app/bnbu_frontend_app/src/store/slices/authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface AuthState {
+export interface AuthState {
   user: User | null
   token: string | null
+  refreshDocuments: boolean
 }
 
-interface User {
+export interface User {
   id: number
   email: string
   user_type: string
@@ -23,6 +24,7 @@ const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('use
 const initialState: AuthState = {
   user: user,
   token: token,
+  refreshDocuments: false,
 }
 
 const authSlice = createSlice({
@@ -51,8 +53,16 @@ const authSlice = createSlice({
       localStorage.removeItem('token')
       localStorage.removeItem('user')
     },
+    // Action to toggle the state
+    toggleRefreshDocuments: (state) => {
+      state.refreshDocuments = !state.refreshDocuments
+    },
+    // Action to set the state
+    setRefreshDocuments: (state, action: PayloadAction<boolean>) => {
+      state.refreshDocuments = action.payload
+    },
   },
 })
 
-export const { setCredentials, setToken, logout } = authSlice.actions
+export const { setCredentials, setToken, logout, toggleRefreshDocuments, setRefreshDocuments } = authSlice.actions
 export default authSlice.reducer

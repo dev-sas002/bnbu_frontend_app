@@ -6,7 +6,7 @@ import { useGetUserProfileQuery} from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const UserDashboard: React.FC = () => {
-  const { data: user, isLoading } = useGetUserProfileQuery();
+  const { data: user, isLoading } = useGetUserProfileQuery(undefined);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);

@@ -7,7 +7,7 @@ import HeaderDropdown from './HeaderDropdown';
 import bnbLogo from '@/assets/images/bnb_logo.png';
 
 const Header: React.FC = () => {
-  const { data: user, isLoading } = useGetUserProfileQuery();
+  const { data: user, isLoading } = useGetUserProfileQuery(undefined);
   const [dropdownOpen, setDropdownOpen] = useState(false); 
   const dropdownRef = useRef<HTMLDivElement | null>(null); 
   const [isModalOpen, setIsModalOpen] = useState(false); 

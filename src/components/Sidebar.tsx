@@ -1,12 +1,30 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false); // State for sidebar visibility
+    const navigate = useNavigate(); // Hook to handle navigation
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen); // Toggle the sidebar open/close state
     };
+
+    const goToLeasePage = () => {
+      navigate('/leases'); // Navigate to Lease Management page
+      setIsOpen(false); // Close sidebar after navigation
+  };
+
+    const goToDashboardPage = () => {
+        navigate('/dashboard'); // Navigate to Lease Management page
+        setIsOpen(false); // Close sidebar after navigation
+    };
+
+    const goToRegulationsPage = () => {
+        navigate('/regulations'); // Navigate to Regulations page
+        setIsOpen(false); // Close sidebar after navigation
+    };
+
 
     return (
         <div>
@@ -34,32 +52,38 @@ const Sidebar: React.FC = () => {
 
                 <nav>
                     <ul>
+                        {/* Dashboard */}
+                        <li onClick={goToDashboardPage} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                            <span>🔑</span>
+                            <span>Dashboard</span>
+                        </li>
+
                         {/* Your Action Items */}
-                        <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                        {/* <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                             <span>📋</span>
                             <span>Your Action Items</span>
-                        </li>
+                        </li> */}
 
                         {/* Deal Reviews */}
-                        <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                        {/* <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                             <span>🔍</span>
                             <span>Deal Reviews</span>
-                        </li>
+                        </li> */}
 
                         {/* Regulations */}
-                        <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                        <li onClick={goToRegulationsPage} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                             <span>⚖️</span>
                             <span>Regulations</span>
                         </li>
 
                         {/* Portfolio Tracker */}
-                        <li>
-                            <div className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                        {/* <li> */}
+                            {/* <div className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                                 <span>📊</span>
                                 <span>Portfolio Tracker</span>
-                            </div>
+                            </div> */}
                             {/* Submenu for Portfolio Tracker */}
-                            <ul className="ml-6">
+                            {/* <ul className="ml-6">
                                 <li className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                                     <span>📈</span>
                                     <span>View All Properties</span>
@@ -68,7 +92,14 @@ const Sidebar: React.FC = () => {
                                     <span>⨁</span>
                                     <span>Add New Property</span>
                                 </li>
-                            </ul>
+                            </ul> */}
+                        {/* </li> */}
+                        {/* Lease Management */}
+                        <li
+                            onClick={goToLeasePage}
+                            className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                            <span>📋</span>
+                            <span>LeaseGuard AI</span>
                         </li>
                     </ul>
                 </nav>
