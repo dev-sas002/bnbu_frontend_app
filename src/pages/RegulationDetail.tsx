@@ -42,33 +42,38 @@ const RegulationDetail: React.FC = () => {
             <h2 className="text-xl font-bold">Regulation Detail</h2>
           </div>
         </div>
-
-        <div className="my-4">
-          <label className="text-sm md:text-base text-gray-700 font-medium">
+  
+        {/* Label on a separate line */}
+        <div className="my-10 text-left">
+          <label className="block text-sm md:text-base text-gray-700 font-medium mb-2">
             Enter a City, Address, and Area
           </label>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Enter city, address or area"
-            className="p-2 border border-gray-300 rounded w-full md:w-1/2"
-          />
+          
+          {/* Wrapper for input and button */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Message RegAdvisor AI"
+              className="p-2 border border-gray-300 rounded w-full sm:w-3/4 md:w-1/2"
+            />
+            
+            <button
+              onClick={handleSubmit}
+              className="bg-red-500 text-white mt-2 sm:mt-0 sm:ml-0 px-4 py-2 rounded hover:bg-red-600"
+            >
+              Submit
+            </button>
+          </div>
         </div>
 
+  
+        {/* Error message */}
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-
-        <div className="mt-4">
-          <button 
-            onClick={handleSubmit} 
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Submit
-          </button>
-        </div>
       </div>
     </Layout>
-  );
+  );    
 };
-
+  
 export default RegulationDetail;
