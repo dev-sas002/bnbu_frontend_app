@@ -13,21 +13,11 @@ const RegulationDetail: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleSubmit = async () => {
-    const parts = inputValue.split(',').map((part) => part.trim());
+    const search = inputValue.trim();
 
-    // Ensure the city is provided
-    if (parts.length < 1 || !parts[0]) {
-      setError('City is required.');
-      return;
-    }
-
-    const city = parts[0];
-    const address = parts.length > 1 ? parts[1] : '';
-    const area = parts.length > 2 ? parts[2] : '';
-
-    // Ensure at least one of address or area is provided
-    if (!address && !area) {
-      setError('You must enter at least one of address or area.');
+    // Ensure the search query is provided
+    if (!search) {
+      setError('Search query is required.');
       return;
     }
 
@@ -37,7 +27,7 @@ const RegulationDetail: React.FC = () => {
     navigate('/regulations');
     
     try {
-      await createRegulation({ city, address, area });
+      await createRegulation({search});
       dispatch(toggleRefreshRegulations());
     } catch (error) {
       console.error('Failed to create regulation:', error);
@@ -52,15 +42,10 @@ const RegulationDetail: React.FC = () => {
             <h2 className="text-xl font-bold">Regulation Detail</h2>
           </div>
         </div>
-        <p className="text-gray-600 mb-4">
-          Please enter the city, and make sure to enter either an address or an area (or both).
-          <br />
-          Example format: "City, Address" or "City, Area" or "City, Address, Area"
-        </p>
 
         <div className="my-4">
           <label className="text-sm md:text-base text-gray-700 font-medium">
-            City, Address, and Area
+            Enter a City, Address, and Area
           </label>
           <input
             type="text"

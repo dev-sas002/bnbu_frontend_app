@@ -39,7 +39,7 @@ const RegulationManagement = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    // refetch();
+    refetch();
   };
 
   const handleNewSearch = () => {

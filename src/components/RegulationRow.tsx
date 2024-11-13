@@ -19,7 +19,7 @@ const RegulationRow: React.FC<RegulationRowProps> = ({ regulation, index }) => {
     <tr onClick={handleRowClick} className="hover:bg-gray-50 cursor-pointer">
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{regulation.date}</td>
-      <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{`${regulation.city} ${regulation.address} ${regulation.area}`}</td>
+      <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{regulation.search}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">
         <span
           title={regulation.status}
