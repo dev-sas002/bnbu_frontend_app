@@ -4,7 +4,7 @@ import { RootState } from '../store'
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:8000',
+    baseUrl: import.meta.env.VITE_API_URL,
     prepareHeaders: (headers, { getState }) => {
       let token = (getState() as RootState).auth.token
       if (!token){
