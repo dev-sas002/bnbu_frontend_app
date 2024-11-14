@@ -8,9 +8,14 @@ import { useSelector } from 'react-redux';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch} from 'react-redux';
 import { RootState } from '@/store';
+import { Document } from '@/types/leaseTypes';
 
 const ViewNotes = () => {
-  const { id, documentId } = useParams();
+  const { id, documentId } = useParams<{ id: string; documentId: string }>();
+
+  const leaseId = id ? Number(id) : undefined;
+  const docId = documentId ? Number(documentId) : undefined;
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const toggle = useSelector((state: RootState) => state.auth.refreshDocuments);
@@ -21,10 +26,10 @@ const ViewNotes = () => {
   const [reviseLease] = useReviseLeaseMutation();
   const [reviewDocuments] = useReviewDocumentsMutation();
 
-  const handleUploadRevision = async (formData: FormData) => {
+  const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
       console.log("FormData being sent:", Array.from(formData.entries()));
-      const uploadedLeaseStatus = await reviseLease({ id, revisedData: formData }).unwrap();
+      const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
       setUploadModalOpen(false);
       
       // Trigger refetch
@@ -60,7 +65,7 @@ const ViewNotes = () => {
   if (isError || !lease) return <Layout><div>Error loading document details</div></Layout>;
 
   const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');
-  const currentDocument = lease.documents.find(doc => doc.id == documentId);
+  const currentDocument = (lease.documents as Document[]).find(doc => doc.id == Number(documentId));
 
   return (
     <Layout>

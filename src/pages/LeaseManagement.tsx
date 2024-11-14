@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import LeaseTable from '../components/LeaseTable';
 import LeaseSearchBar from '../components/LeaseSearchBar';
 import UploadLeaseModal from '../components/UploadLeaseModal';
-import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery, useReviewDocumentsMutation } from '../services/api';
+import { useGetAllLeasesQuery, useUploadLeaseMutation, useUpdateLeaseMutation, useSearchLeasesQuery, useReviewDocumentsMutation, useReviseLeaseMutation } from '../services/api';
 import Layout from '../components/Layout';
 import { Lease } from '@/types/leaseTypes';
 import { set } from 'react-datepicker/dist/date_utils';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import { Document } from '@/types/leaseTypes';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -17,6 +18,7 @@ const LeaseManagement = () => {
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadLease] = useUploadLeaseMutation();
   const [updateLease] = useUpdateLeaseMutation();
+  const [reviseLease] = useReviseLeaseMutation();
   const [reviewDocuments] = useReviewDocumentsMutation(); 
   const [searchFilters, setSearchFilters] = useState({
     address: '',
@@ -59,7 +61,7 @@ const LeaseManagement = () => {
       setUploadModalOpen(false);
 
     if (uploadedLease.documents && uploadedLease.documents.length > 0) {
-      const documentIds = uploadedLease.documents.map(doc => doc.id).filter(id => id); // Collect document IDs
+      const documentIds = uploadedLease.documents.map((doc: Document) => doc.id).filter((id: number) => id); // Collect document IDs
 
       try {
         // Review all documents at once using the reviewDocuments mutation
@@ -83,6 +85,15 @@ const LeaseManagement = () => {
       refetch();
     } catch (error) {
       console.error("Failed to update lease:", error);
+    }
+  };
+
+  const handleReviseLease = async (leaseId: number, revisedData: FormData) => {
+    try {
+      await reviseLease({ id: leaseId, revisedData }).unwrap();
+      refetch();
+    } catch (error) {
+      console.error("Failed to revise lease:", error);
     }
   };
 
@@ -116,7 +127,7 @@ const LeaseManagement = () => {
           </button>
         </div>
         <LeaseSearchBar onSearch={handleSearch} />
-        <LeaseTable leases={displayedLeases} onUpdate={handleUpdateLease} />
+        <LeaseTable leases={displayedLeases} onUpdate={handleUpdateLease} onUpdateRevision={handleReviseLease}/>
 
         {/* Pagination Controls */}
         <div className="flex justify-between items-center mt-4">
