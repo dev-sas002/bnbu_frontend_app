@@ -7,7 +7,7 @@ import UploadRevisionLeaseModal from './UploadRevisionLeaseModal';
 interface LeaseTableProps {
   leases: Lease[];
   onUpdate: (leaseData: Lease) => void;
-  onUpdateRevision: (formData: FormData) => Promise<void>;
+  onUpdateRevision: (leaseId: number, revisedData: FormData) => Promise<void>;
 }
 
 const LeaseTable: React.FC<LeaseTableProps> = ({ leases = [], onUpdate, onUpdateRevision }) => {

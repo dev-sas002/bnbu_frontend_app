@@ -6,6 +6,7 @@ export interface Document {
   file: string;
   version: string;
   uploaded_at: string;
+  status: string;
 }
 
 export interface Lease {
