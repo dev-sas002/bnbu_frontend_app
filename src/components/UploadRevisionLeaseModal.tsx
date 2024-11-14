@@ -6,7 +6,7 @@ interface UploadRevisionLeaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   leaseData: Lease | null;
-  onUpdateRevision: (formData: FormData) => Promise<void>;
+  onUpdateRevision: (leaseId: number, revisedData: FormData) => Promise<void>;
 }
 
 const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
@@ -38,14 +38,14 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
       setIsUploading(true);
       const formData = new FormData();
       files.forEach(file => formData.append('documents', file)); // Append all selected files
-      formData.append('leaseId', leaseData?.id ? leaseData.id.toString() : '');
-  
-      // Pass the formData to onUpdate
-      const res = await onUpdateRevision(formData); 
-      alert('Lease revision uploaded successfully!');
-      console.log(res);
-      
-      onClose();
+      if (leaseData?.id) {
+        // Pass the leaseId and formData to the onUpdateRevision function
+        await onUpdateRevision(leaseData.id, formData);
+        alert('Lease revision uploaded successfully!');
+        onClose();
+      } else {
+        alert('Lease ID is missing!');
+      }
     } catch (error) {
       console.error('Failed to upload revision:', error);
       alert('Failed to upload revision.');

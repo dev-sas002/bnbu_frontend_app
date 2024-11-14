@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetLeaseByIdQuery, useGetDocumentNamesByLeaseIdQuery, useReviseLeaseMutation, useReviewDocumentsMutation } from '../services/api';
 import UploadRevisionLeaseModal from '../components/UploadRevisionLeaseModal';
 import Layout from '../components/Layout';
-import { Lease } from '@/types/leaseTypes';
+import { Document } from '@/types/leaseTypes';
 import { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
@@ -45,7 +45,7 @@ const LeaseDetail = () => {
   }, [id, refetchDocuments, toggle]);
 
   // Update the upload logic in LeaseDetail to convert Lease to FormData
-  const handleUploadRevision = async (formData: FormData) => {
+  const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
       console.log("FormData being sent:", Array.from(formData.entries()));
       
@@ -53,7 +53,7 @@ const LeaseDetail = () => {
       const lastUploadedAt = documents?.length > 0 ? new Date(documents[documents.length - 1].uploaded_at).getTime() : 0;
   
       // Start uploading the revision
-      const uploadedLeaseStatus = await reviseLease({ id, revisedData: formData }).unwrap();
+      const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
       console.log("Uploaded Lease Status:", uploadedLeaseStatus);
   
       setUploadModalOpen(false);
@@ -122,7 +122,7 @@ const LeaseDetail = () => {
               </tr>
             </thead>
             <tbody>
-              {documents?.map((doc, index) => (
+              {documents?.map((doc : Document, index : number) => (
                   <tr key={`${doc.id}-${index}`} className="hover:bg-gray-50 cursor-pointer border-b border-gray-200">
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{index + 1}</td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">{formatDate(doc.uploaded_at)}</td>

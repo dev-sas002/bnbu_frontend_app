@@ -19,7 +19,7 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   const [userList, setUserList] = useState<User[]>(users?.results || []); // Local state for user list
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
