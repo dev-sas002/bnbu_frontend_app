@@ -264,6 +264,112 @@ export const api = createApi({
       }),
     }),
 
+    // Regulations: Fetch list of regulations
+    // getRegulations: builder.query({
+    //   query: () => ({
+    //     url: '/api/regulations/',
+    //     method: 'GET',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //   }),
+    // }),
+
+    // getRegulations: builder.query({
+    //   query: (page = 1) => `api/regulations/?page=${page}`, // Include page number in query
+    //   keepUnusedDataFor: 0, // Prevent caching
+    // }),
+
+    getRegulations: builder.query({
+      query: (page = 1) => ({
+        url: `/api/regulations/?page=${page}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+    
+
+
+    // Regulations: Create a new regulation
+    createRegulation: builder.mutation({
+      query: (regulationData) => ({
+        url: '/api/regulations/',
+        method: 'POST',
+        body: regulationData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+
+    // Regulations: Fetch a specific regulation by ID
+    getRegulationById: builder.query({
+      query: (id) => ({
+        url: `/api/regulations/${id}/`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+
+    // Regulations: Send a message to GPT about a specific regulation
+    RegulationchatWithGpt: builder.mutation({
+      query: ({ regulationId, message }) => ({
+        url: `/api/regulations/${regulationId}/chat/`, // Endpoint for chat action
+        method: 'POST',
+        body: { regulation_id: regulationId, message },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+
+    // Regulations: Get the chat history for a specific regulation
+    RegulationgetChatHistory: builder.query({
+      query: (regulationId) => ({
+        url: `/api/regulations/${regulationId}/get-chat-history/`, // Endpoint for chat history
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
+
+    // Fetch a list of regulations with search functionality
+    searchRegulations: builder.query({
+      query: (params) => {
+        const { page, query, startDate, endDate, status } = params || {};
+        let url = `api/regulations/search/?`; // Updated endpoint for regulations search
+        
+        // Append page to the query if provided and defined
+        if (page !== undefined) url += `page=${page}&`;
+
+        // Append query (address, city, or area) to the query if provided
+        if (query) url += `query=${encodeURIComponent(query)}&`;
+        
+        // Append startDate to the query if provided
+        if (startDate) url += `start_date=${encodeURIComponent(startDate)}&`;
+        
+        // Append endDate to the query if provided
+        if (endDate) url += `end_date=${encodeURIComponent(endDate)}&`;
+        
+        // Append status to the query if provided
+        if (status) url += `status=${encodeURIComponent(status)}`;
+        
+        // Remove the last '&' if it exists
+        if (url.endsWith('&')) {
+          url = url.slice(0, -1);
+        }
+        
+        return url;
+      },
+    }),
+
+
 
 
   }),
@@ -296,4 +402,10 @@ export const {
   useReviewDocumentsMutation,
   useChatWithGptMutation,
   useGetChatHistoryQuery,
+  useGetRegulationsQuery,
+  useCreateRegulationMutation,
+  useGetRegulationByIdQuery,
+  useRegulationchatWithGptMutation,
+  useRegulationgetChatHistoryQuery,
+  useSearchRegulationsQuery,
 } = api

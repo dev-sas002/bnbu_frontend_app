@@ -9,6 +9,9 @@ import DocumentPreview from './pages/DocumentPreview';
 import ViewNotes from './pages/ViewNotes'
 import './App.css'
 import Layout from './components/Layout';
+import RegulationManagement from './pages/RegulationManagement';
+import RegulationDetail from './pages/RegulationDetail';
+import ViewRegulationChat from './pages/ViewRegulationChat';
 
 const App: React.FC = () => {
   return (
@@ -59,12 +62,29 @@ const App: React.FC = () => {
       />
       <Route
         path="/regulations"
-        // element={
-        //   <PrivateRoute>
-        //     <Regulations />
-        //   </PrivateRoute>
-        // }
+        element={
+          <PrivateRoute>
+            <RegulationManagement />  {/* Added Regulation Management Route */}
+          </PrivateRoute>
+        }
       />
+      <Route
+        path="/regulation/:id"
+        element={
+          <PrivateRoute>
+            <RegulationDetail />  {/* Added Regulation Detail Route */}
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/regulation/:regulationId/chat"
+        element={
+          <PrivateRoute>
+            <ViewRegulationChat />  {/* Updated Regulation Chat Route */}
+          </PrivateRoute>
+        }
+      />
+
     </Routes>
   )
 }
