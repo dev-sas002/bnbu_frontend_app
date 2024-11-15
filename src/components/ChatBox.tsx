@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useChatWithGptMutation, useGetChatHistoryQuery } from '../services/api';
 import dayjs from 'dayjs';
 import { Lease } from '@/types/leaseTypes';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   text: string;
@@ -117,7 +118,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
       {summary && (
         <div className="mb-6 p-4 items-center justify-center  bg-yellow-100 border-l-4 border-yellow-500 rounded">
           <strong>Initial Analysis</strong> 
-          <p>{summary}</p>
+          <ReactMarkdown>{summary}</ReactMarkdown>
         </div>
       )}
       <h3 className="text-lg font-bold text-red-600 mb-4">Chat with LeaseGuard AI</h3>
@@ -125,7 +126,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
         {messages.map((message, index) => (
           <div key={index} className={`mb-2 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
             <div className={`inline-block p-3 rounded max-w-4xl ${message.sender === 'user' ? 'bg-red-200 text-red-900' : 'bg-gray-200 text-gray-800'}`}>
-              <div>{message.text}</div>
+            <ReactMarkdown>{message.text}</ReactMarkdown>
               <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
             </div>
           </div>
