@@ -114,42 +114,44 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
   }
 
   return (
-    <div className="chat-box border p-4 rounded shadow-md bg-white mx-auto">
-      {summary && (
-        <div className="mb-6 p-4 items-center justify-center  bg-yellow-100 border-l-4 border-yellow-500 rounded">
-          <strong>Initial Analysis</strong> 
-          <ReactMarkdown>{summary}</ReactMarkdown>
-        </div>
-      )}
-      <h3 className="text-lg font-bold text-red-600 mb-4">Chat with LeaseGuard AI</h3>
-      <div className="chat-messages overflow-y-auto h-72 mb-6 border p-4 rounded bg-gray-50 shadow-inner">
-        {messages.map((message, index) => (
-          <div key={index} className={`mb-2 ${message.sender === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block p-3 rounded max-w-4xl ${message.sender === 'user' ? 'bg-red-200 text-red-900' : 'bg-gray-200 text-gray-800'}`}>
-            <ReactMarkdown>{message.text}</ReactMarkdown>
-              <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
-            </div>
-          </div>
-        ))}
-        {isGPTTyping && <div className="text-gray-500 italic">LeaseGuard AI is typing...</div>}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="flex items-center">
+    <div className="text-left ml-8 mr-8">
+
+      <div className="flex items-center justify-start space-x-2 mb-10 pl-3">
         <input
           type="text"
           value={input}
           onChange={handleInputChange}
-          className="border p-3 flex-grow rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+          className="border p-2 w-full sm:w-80 md:w-96 lg:w-1/2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
           placeholder="Type your message to send it to LeaseGuard AI..."
         />
         <button
           onClick={handleSendMessage}
           disabled={isSendingMessage || !input.trim()}
-          className="ml-2 p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           Send
         </button>
       </div>
+
+      <div className="chat-messages overflow-y-auto mb-6 p-4 pl-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+        {summary && (
+          <div className="mb-2 p-4 items-center justify-center">
+            <strong>Initial Analysis</strong> 
+            <ReactMarkdown>{summary}</ReactMarkdown>
+          </div>
+        )}
+        {messages.map((message, index) => (
+          <div key={index} className="mb-2 text-left">
+            <div className="inline-block p-3 rounded max-w-7xl bg-transparent text-black">
+              <ReactMarkdown>{message.text}</ReactMarkdown>
+              <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
+            </div>
+          </div>
+        ))}
+        {isGPTTyping && <div className="text-gray-500 italic text-center">LeaseGuard AI is typing...</div>}
+        <div ref={messagesEndRef} />
+      </div>
+      
     </div>
   );
 };
