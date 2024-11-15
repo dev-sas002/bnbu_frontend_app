@@ -37,7 +37,7 @@ const ViewRegulationChat = () => {
   return (
     <Layout>
       <div className="w-full mt-6">
-        <div className="w-full max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <RegulationChatBox regulation={regulation} />
         </div>
       </div>
