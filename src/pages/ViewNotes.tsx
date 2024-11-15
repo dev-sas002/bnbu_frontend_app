@@ -72,17 +72,17 @@ const ViewNotes = () => {
       <div className="p-4 flex-1 bg-white w-full mx-auto">
         {/* Document Detail and Upload Button */}
         <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <h2 className="text-xl font-bold">Document Detail</h2>
+          <h2 className="text-xl font-bold lg:pl-7">Document Detail</h2>
           <button
             onClick={() => setUploadModalOpen(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 lg:mr-7 rounded hover:bg-red-600"
           >
             Upload Revision
           </button>
         </div>
   
         {/* Address, Document Name, and Status */}
-        <div className="mt-4 text-left space-y-2 text-black font-medium text-lg">
+        <div className="mt-4 text-left space-y-2 text-black font-medium text-lg pl-7">
           <p>{fullAddress || "No address available"}</p>
           <p>Current Document: {currentDocument ? currentDocument.name : "<Document Name>"}</p>
           <p>
@@ -114,7 +114,7 @@ const ViewNotes = () => {
 
       {/* Chat Box Component */}
       <div className="w-full mt-6">
-        <div className="w-full max-w-5xl mx-auto">
+        <div className="w-full mx-auto">
           <ChatBox documentId={documentId} lease={lease} />
         </div>
       </div>
