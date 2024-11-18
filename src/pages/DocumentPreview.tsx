@@ -21,7 +21,7 @@ const DocumentPreview: React.FC = () => {
   
       try {
           const apiUrl = import.meta.env.VITE_API_URL;
-          const response = await fetch(`${apiUrl}/api/documents/preview/${documentId}/`, {
+          const response = await fetch(`${apiUrl}api/documents/preview/${documentId}/`, {
               method: 'GET',
               headers: {
                   'Authorization': `Bearer ${token}`,
