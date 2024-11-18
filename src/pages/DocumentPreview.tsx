@@ -20,7 +20,8 @@ const DocumentPreview: React.FC = () => {
       }
   
       try {
-          const response = await fetch(`http://127.0.0.1:8000/api/documents/preview/${documentId}/`, {
+          const apiUrl = import.meta.env.VITE_API_URL;
+          const response = await fetch(`${apiUrl}/api/documents/preview/${documentId}/`, {
               method: 'GET',
               headers: {
                   'Authorization': `Bearer ${token}`,
