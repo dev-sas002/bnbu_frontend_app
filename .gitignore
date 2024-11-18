@@ -83,6 +83,9 @@ typings/
 .env
 .env.test
 .env*.local
+.env.development
+.env.production
+.env.staging
 
 .cache
 .parcel-cache
