@@ -35,11 +35,6 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
     return dayjs(timestamp).format('DD/MM/YYYY hh:mm A');
   };
 
-  // Scroll to the latest message
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   // Handle sending a message
   const handleSendMessage = async () => {
     if (input.trim() && regulation.id) {
@@ -82,35 +77,44 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
 
   // Map chat history from backend response
   const mapChatHistory = (chatHistory: any[]): Message[] => {
-    return chatHistory.map((msg) => ({
-      text: msg.content,
-      sender: msg.role === 'user' ? 'user' : 'system',
-      timestamp: formatTimestamp(msg.timestamp),
-    }));
+    return chatHistory
+      .filter((msg) => msg?.content) // Filter out invalid messages
+      .map((msg) => ({
+        text: msg.content,
+        sender: msg.role === 'user' ? 'user' : 'system',
+        timestamp: formatTimestamp(msg.timestamp),
+      }));
   };
 
   // Fetch chat history on load
   useEffect(() => {
     refetch();
-    if (data?.chat_history) {
+    if (data?.chat_history && Array.isArray(data.chat_history)) {
       setMessages(mapChatHistory(data.chat_history));
 
       // Update the summary if it's available and different from the current one
       if (data.gpt_response?.message && data.gpt_response.message !== summary) {
-      setSummary(data.gpt_response.message);
-    }
-
-      scrollToBottom();
+        setSummary(data.gpt_response.message);
+      }
     }
   }, [data, data?.gpt_response?.message, summary, regulation.id]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   if (error) {
     return <div>Error loading regulation chat history.</div>;
   }
+
+  // Group messages by pairs and reverse the groups
+  const groupedMessages = [];
+  for (let i = 0; i < messages.length; i += 2) {
+    // Ensure both messages exist before pushing
+    if (messages[i] && messages[i + 1]) {
+      groupedMessages.push([messages[i], messages[i + 1]]);
+    } else if (messages[i]) {
+      groupedMessages.push([messages[i]]);
+    }
+  }
+  groupedMessages.reverse();
+
 
   return (
     <div className="text-left ml-8 mr-8">
@@ -163,21 +167,30 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
       </div>
   
       <div className="chat-messages overflow-y-auto mb-6 p-4 pl-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+        {isGPTTyping && <div className="text-gray-500 italic text-center">RegAdvisor AI is typing...</div>}
+          {groupedMessages.map((group, index) => (
+            <React.Fragment key={index}>
+              {group.map((message, idx) => (
+                <div key={idx} className="mb-2 text-left">
+                  {message?.text ? (
+                    <div className="inline-block p-3 rounded max-w-7xl bg-transparent text-black">
+                      <ReactMarkdown>{message.text}</ReactMarkdown>
+                      <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
+                    </div>
+                  ) : (
+                    <div className="text-red-500">Error: Message content missing</div>
+                  )}
+                </div>
+              ))}
+            </React.Fragment>
+          ))}
+
         {summary && (
           <div className="mb-2 p-4 items-center justify-center">
             <strong>Initial Analysis</strong>
             <ReactMarkdown>{summary}</ReactMarkdown>
           </div>
         )}
-        {messages.map((message, index) => (
-          <div key={index} className="mb-2 text-left">
-            <div className="inline-block p-3 rounded max-w-7xl bg-transparent text-black">
-              <ReactMarkdown>{message.text}</ReactMarkdown>
-              <div className="text-xs text-gray-500 mt-1">{message.timestamp}</div>
-            </div>
-          </div>
-        ))}
-        {isGPTTyping && <div className="text-gray-500 italic text-center">RegAdvisor AI is typing...</div>}
         <div ref={messagesEndRef} />
       </div>
     </div>
