@@ -8,6 +8,7 @@ import { RootState } from '@/store';
 import { useSelector } from 'react-redux';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -69,7 +70,7 @@ const LeaseDetail = () => {
             console.log(`New documents reviewed.`);
           } catch (reviewError) {
             console.error(`Error reviewing documents:`, reviewError);
-            alert('Failed to review documents');
+            toast.error('Failed to review documents');
           }
         }
        else {

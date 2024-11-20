@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
+import { toast } from 'react-toastify';
 
 interface UploadRevisionLeaseModalProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
 
   const handleUpload = async () => {
     if (files.length === 0) {
-      alert('Please select a file to upload.');
+      toast.warn('Please select a file to upload.');
       return;
     }
   
@@ -41,14 +42,14 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
       if (leaseData?.id) {
         // Pass the leaseId and formData to the onUpdateRevision function
         await onUpdateRevision(leaseData.id, formData);
-        alert('Lease revision uploaded successfully!');
+        toast.success('Lease revision uploaded successfully!');
         onClose();
       } else {
-        alert('Lease ID is missing!');
+        toast.error('Lease ID is missing!');
       }
     } catch (error) {
       console.error('Failed to upload revision:', error);
-      alert('Failed to upload revision.');
+      toast.error('Failed to upload revision.');
     } finally {
       setIsUploading(false);
       setFiles([]); // Clear files after upload

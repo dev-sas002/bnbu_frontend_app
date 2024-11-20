@@ -11,6 +11,7 @@ import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
+import { toast } from 'react-toastify';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -70,7 +71,7 @@ const LeaseManagement = () => {
         console.log(`All documents reviewed.`);
       } catch (reviewError) {
         console.error(`Error reviewing documents:`, reviewError);
-        alert('Failed to review documents');
+        toast.error('Failed to review documents');
       }
     }
     

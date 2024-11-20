@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Modal from './Modal';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
+import { toast } from 'react-toastify';
 
 interface UploadLeaseModalProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
 
   const handleUpload = async () => {
     if (!isEditMode && files.length === 0) {
-      alert('Please select at least one file to upload.');
+      toast.warn('Please select at least one file to upload.');
       return;
     }
 
@@ -88,15 +89,15 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
 
       if (isEditMode && leaseData?.id) {
         await onUpdate(newLeaseData);
-        alert('Lease updated successfully!');
+        toast.success('Lease updated successfully!');
       } else {
         await onUpload(formData);
-        alert('Lease uploaded successfully!');
+        toast.success('Lease uploaded successfully!');
       }
       onClose();
     } catch (error) {
       console.error('Failed to upload/update lease:', error);
-      alert('Failed to upload/update lease.');
+      toast.error('Failed to upload/update lease.');
     } finally {
       setIsUploading(false);
     }
