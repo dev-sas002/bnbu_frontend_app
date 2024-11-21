@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
 import { toast } from 'react-toastify';
+import LeaseBreadcrumb from '../components/LeaseBreadcrumb';
 
 const LeaseManagement = () => {
   const [page, setPage] = useState(1);
@@ -118,8 +119,14 @@ const LeaseManagement = () => {
   return (
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <h2 className="text-xl font-semibold">Your Leases</h2>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start">
+            <h2 className="text-xl font-bold">Your Leases</h2>
+            {/* Added spacing between the heading and breadcrumb */}
+            <div>
+              <LeaseBreadcrumb />
+            </div>
+          </div>
           <button
             onClick={() => setUploadModalOpen(true)}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"

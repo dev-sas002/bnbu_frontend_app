@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -91,9 +92,13 @@ const LeaseDetail = () => {
   return (
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <div>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start">
             <h2 className="text-xl font-bold">Lease Detail</h2>
+            {/* Added spacing between the heading and breadcrumb */}
+            <div>
+              <LeaseBreadcrumb />
+            </div>
           </div>
           <button
             onClick={() => setUploadModalOpen(true)}

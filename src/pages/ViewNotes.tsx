@@ -10,6 +10,7 @@ import { useDispatch} from 'react-redux';
 import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
 import { toast } from 'react-toastify';
+import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
 
 const ViewNotes = () => {
   const { id, documentId } = useParams<{ id: string; documentId: string }>();
@@ -72,8 +73,13 @@ const ViewNotes = () => {
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
         {/* Document Detail and Upload Button */}
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <h2 className="text-xl font-bold lg:pl-7">Document Detail</h2>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start lg:pl-7">
+            <h2 className="text-xl font-bold ">Document Detail</h2>
+            <div>
+              <LeaseBreadcrumb lease={lease}/>
+            </div>
+          </div>
           <button
             onClick={() => setUploadModalOpen(true)}
             className="bg-red-500 text-white px-4 py-2 lg:mr-7 rounded hover:bg-red-600"
