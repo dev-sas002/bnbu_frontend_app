@@ -9,6 +9,7 @@ import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch} from 'react-redux';
 import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
+import { toast } from 'react-toastify';
 
 const ViewNotes = () => {
   const { id, documentId } = useParams<{ id: string; documentId: string }>();
@@ -45,7 +46,7 @@ const ViewNotes = () => {
           console.log("Documents reviewed successfully.");
         } catch (reviewError) {
           console.error("Error reviewing documents:", reviewError);
-          alert('Failed to review documents');
+          toast.error('Failed to review documents');
         }
       }
     } catch (error) {

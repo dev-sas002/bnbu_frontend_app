@@ -4,6 +4,7 @@ import { useCreateRegulationMutation } from '../services/api';
 import Layout from '../components/Layout';
 import { useDispatch } from 'react-redux';
 import { toggleRefreshRegulations } from '@/store/slices/authSlice';
+import { toast } from 'react-toastify';
 
 const RegulationDetail: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -32,8 +33,11 @@ const RegulationDetail: React.FC = () => {
       }, 1000);
       await createRegulation({search});
       dispatch(toggleRefreshRegulations());
+      toast.success('Regulation created successfully!');
     } catch (error) {
       console.error('Failed to create regulation:', error);
+      // Show error toast in case of failure
+      toast.error('Failed to create regulation. Please try again.');
     }
   };
 
