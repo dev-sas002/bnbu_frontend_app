@@ -18,6 +18,7 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [summary, setSummary] = useState<string | null>(null);
+  const [summaryCreatedTime, setSummaryCreatedTime] = useState<string | null>(null);
   const [isGPTTyping, setIsGPTTyping] = useState(false);
 
   const [regulationChatWithGpt, { isLoading: isSendingMessage }] = useRegulationchatWithGptMutation();
@@ -63,6 +64,11 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
         if (!summary && response.summary) {
           setSummary(response.summary);
         }
+        // Store summary created time if available
+        if (data.gpt_response.timestamp) {
+          setSummaryCreatedTime(data.gpt_response.timestamp);
+        }
+
       } catch (err) {
         console.error('Error chatting with GPT:', err);
       } finally {
@@ -96,8 +102,12 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
       if (data.gpt_response?.message && data.gpt_response.message !== summary) {
         setSummary(data.gpt_response.message);
       }
+      // Update summary created time if available
+      if (data.gpt_response.timestamp) {
+        setSummaryCreatedTime(data.gpt_response.timestamp);
+      }
     }
-  }, [data, data?.gpt_response?.message, summary, regulation.id]);
+  }, [data, data?.gpt_response?.message, summary, data?.gpt_response.timestamp, regulation.id]);
 
   if (error) {
     return <div>Error loading regulation chat history.</div>;
@@ -188,7 +198,21 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
         {summary && (
           <div className="mb-2 p-4 items-center justify-center">
             <strong>Initial Analysis</strong>
-            <ReactMarkdown>{summary}</ReactMarkdown>
+            {summaryCreatedTime && (
+              <div className="text-xs text-gray-500 mb-7">
+                {formatTimestamp(summaryCreatedTime)}
+              </div>
+            )}
+            <ReactMarkdown
+              components={{
+                
+                p: ({node, ...props}) => (
+                  <p style={{marginBottom: "2rem"}} {...props} />
+                ),
+              }}
+            >
+              {summary}
+            </ReactMarkdown>
           </div>
         )}
         <div ref={messagesEndRef} />
