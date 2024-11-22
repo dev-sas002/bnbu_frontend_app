@@ -10,6 +10,7 @@ import { useDispatch} from 'react-redux';
 import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
 import { toast } from 'react-toastify';
+import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
 
 const ViewNotes = () => {
   const { id, documentId } = useParams<{ id: string; documentId: string }>();
@@ -29,7 +30,7 @@ const ViewNotes = () => {
 
   const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
-      console.log("FormData being sent:", Array.from(formData.entries()));
+      // console.log("FormData being sent:", Array.from(formData.entries()));
       const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
       setUploadModalOpen(false);
       
@@ -43,7 +44,7 @@ const ViewNotes = () => {
         try {
           await reviewDocuments({ documentIds });
           dispatch(toggleRefreshDocuments());
-          console.log("Documents reviewed successfully.");
+          // console.log("Documents reviewed successfully.");
         } catch (reviewError) {
           console.error("Error reviewing documents:", reviewError);
           toast.error('Failed to review documents');
@@ -62,8 +63,25 @@ const ViewNotes = () => {
     }
   }, [toggle, refetchLease, refetchDocument]);
 
-  if (isLoading) return <Layout><div>Loading...</div></Layout>;
-  if (isError || !lease) return <Layout><div>Error loading document details</div></Layout>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (isError || !lease) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading document details</div>
+        </div>
+      </Layout>
+    );
+  }
 
   const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');
   const currentDocument = (lease.documents as Document[]).find(doc => doc.id == Number(documentId));
@@ -72,8 +90,13 @@ const ViewNotes = () => {
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
         {/* Document Detail and Upload Button */}
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <h2 className="text-xl font-bold lg:pl-7">Document Detail</h2>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start lg:pl-7">
+            <h2 className="text-xl font-bold ">Document Detail</h2>
+            <div>
+              <LeaseBreadcrumb lease={lease}/>
+            </div>
+          </div>
           <button
             onClick={() => setUploadModalOpen(true)}
             className="bg-red-500 text-white px-4 py-2 lg:mr-7 rounded hover:bg-red-600"

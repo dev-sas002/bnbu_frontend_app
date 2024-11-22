@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
+import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -48,14 +49,14 @@ const LeaseDetail = () => {
   // Update the upload logic in LeaseDetail to convert Lease to FormData
   const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
-      console.log("FormData being sent:", Array.from(formData.entries()));
+      // console.log("FormData being sent:", Array.from(formData.entries()));
       
       // Store the timestamp of the latest document before the revision upload
       const lastUploadedAt = documents?.length > 0 ? new Date(documents[documents.length - 1].uploaded_at).getTime() : 0;
   
       // Start uploading the revision
       const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
-      console.log("Uploaded Lease Status:", uploadedLeaseStatus);
+      // console.log("Uploaded Lease Status:", uploadedLeaseStatus);
   
       setUploadModalOpen(false);
       refetch();  // Fetch the updated lease data
@@ -67,7 +68,7 @@ const LeaseDetail = () => {
           try {
             await reviewDocuments({ documentIds });
             dispatch(toggleRefreshDocuments())
-            console.log(`New documents reviewed.`);
+            // console.log(`New documents reviewed.`);
           } catch (reviewError) {
             console.error(`Error reviewing documents:`, reviewError);
             toast.error('Failed to review documents');
@@ -82,8 +83,25 @@ const LeaseDetail = () => {
     }
   };
   
-  if (isLoading) return <Layout><div>Loading...</div></Layout>;
-  if (isError || !lease) return <Layout><div>Error loading lease details</div></Layout>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (isError || !lease) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading lease details</div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Concatenate address1 and address2, handling null or empty case for address2
   const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');
@@ -91,9 +109,13 @@ const LeaseDetail = () => {
   return (
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <div>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start">
             <h2 className="text-xl font-bold">Lease Detail</h2>
+            {/* Added spacing between the heading and breadcrumb */}
+            <div>
+              <LeaseBreadcrumb />
+            </div>
           </div>
           <button
             onClick={() => setUploadModalOpen(true)}
@@ -143,7 +165,7 @@ const LeaseDetail = () => {
                     </td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">
                       <button onClick={() => {
-                          console.log("Button clicked, navigating to preview");
+                          // console.log("Button clicked, navigating to preview");
                           navigate(`/preview/${doc.id}`);
                           }} className="text-red-500 hover:underline">
                           View Document
