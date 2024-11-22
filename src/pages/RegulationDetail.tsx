@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import { useDispatch } from 'react-redux';
 import { toggleRefreshRegulations } from '@/store/slices/authSlice';
 import { toast } from 'react-toastify';
+import RegulationBreadcrumb from '@/components/RegulationBreadcrumb';
 
 const RegulationDetail: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -44,9 +45,12 @@ const RegulationDetail: React.FC = () => {
   return (
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <div>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start">
             <h2 className="text-xl font-bold">Regulation Detail</h2>
+            <div>
+              <RegulationBreadcrumb />
+            </div>
           </div>
         </div>
   

@@ -3,6 +3,7 @@ import { useRegulationchatWithGptMutation, useRegulationgetChatHistoryQuery } fr
 import { Regulation } from '@/types/regulationTypes';
 import dayjs from 'dayjs';
 import ReactMarkdown from 'react-markdown';
+import RegulationBreadcrumb from './RegulationBreadcrumb';
 
 interface Message {
   text: string;
@@ -131,10 +132,15 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
   
       {/* Regulation Detail Section */}
       <div className="mb-6 px-4 md:px-6 lg:px-0 w-full">
-        <div className='mb-4 md:mb-10 mt-4 pl-3'>
-          <h3 className="text-xl md:text-2xl font-bold mb-4 text-center lg:text-left">
+        <div className='mb-4 md:mb-10 mt-10 pl-3'>
+          <h3 className="text-xl md:text-2xl font-bold mb-0 text-center lg:text-left">
             Regulation Details
           </h3>
+          <div className="text-center lg:text-left">
+          <div className="text-xs sm:text-xs md:text-base">
+            <RegulationBreadcrumb regulation={regulation} />
+          </div>
+          </div>
         </div>
   
         <div className="max-w-2xl lg:max-w-full mx-auto lg:mx-0 lg:pl-3">

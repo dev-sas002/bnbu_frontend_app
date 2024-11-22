@@ -1,25 +1,24 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-interface LeaseBreadcrumbProps {
-  lease?: any; // Or define a more specific type for `lease`
+interface RegulationBreadcrumbProps {
+  regulation?: { search?: string }; // Define a type for the regulation object
 }
 
-const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
+const RegulationBreadcrumb: React.FC<RegulationBreadcrumbProps> = ({ regulation }) => {
   const location = useLocation();
 
   // Mapping of paths to breadcrumb names
   const breadcrumbMap: Record<string, string> = {
-    "/leases": "Your Leases",
-    "/lease/:id": "Lease Detail",
-    "/lease/:id/documents/:documentId/notes": "Document Notes",
+    "/regulations": "Your Regulation Searches",
+    "/regulation/:id": "Regulation Detail",
+    "/regulation/:regulationId/chat": "Notes",
   };
 
-  // Helper to match dynamic routes with current path
+  // Helper to match dynamic routes with the current path
   const matchRoute = (path: string, currentPath: string): boolean => {
-    // Convert dynamic routes into regex
     const regex = new RegExp(
-      `^${path.replace(/:[^/]+/g,"[^/]+")}$`
+      `^${path.replace(/:[^/]+/g, "[^/]+")}$`
     );
     return regex.test(currentPath);
   };
@@ -35,14 +34,14 @@ const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
       path: "/dashboard",
     });
 
-    // Check if the path is related to leases and add "Your Leases" only once
+    // Check if the path is related to regulations and add "Your Regulation Searches" only once
     if (
-      location.pathname.includes("/lease") &&
-      !breadcrumbs.some((b) => b.name === breadcrumbMap["/leases"])
+      location.pathname.includes("/regulation") &&
+      !breadcrumbs.some((b) => b.name === breadcrumbMap["/regulations"])
     ) {
       breadcrumbs.push({
-        name: breadcrumbMap["/leases"],
-        path: "/leases",
+        name: breadcrumbMap["/regulations"],
+        path: "/regulations",
       });
     }
 
@@ -55,10 +54,11 @@ const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
       );
 
       if (matchedRoute) {
-        // Skip adding the breadcrumb for "/leases"
-        if (matchedRoute === "/leases") {
+        // Skip adding the breadcrumb for "/regulations"
+        if (matchedRoute === "/regulations") {
           return;
         }
+
         const name = breadcrumbMap[matchedRoute];
         breadcrumbs.push({
           name,
@@ -66,17 +66,18 @@ const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
         });
       }
     });
-  
-    // If on the document notes page, replace "Document Notes" with the lease address
-    if (location.pathname.includes("/lease/") && lease) {
-      const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');
-      const addressBreadcrumb = {
-        name: fullAddress || "Lease Address",
+
+    // If on the "Notes" page, replace "Notes" with a dynamic value
+    if (location.pathname.includes("/regulation/") && regulation?.search) {
+      const dynamicBreadcrumb = {
+        name: regulation.search || "Regulation Search",
         path: accumulatedPath, // Include the current path for consistency
       };
-      // Remove "Document Notes" and add the dynamic address breadcrumb
-      breadcrumbs.splice(breadcrumbs.length - 1, 1, addressBreadcrumb);
+
+      // Remove "Notes" and add the dynamic breadcrumb
+      breadcrumbs.splice(breadcrumbs.length - 1, 1, dynamicBreadcrumb);
     }
+
     return breadcrumbs;
   };
 
@@ -94,7 +95,7 @@ const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
             ) : (
               <span className="font-bold">{breadcrumb.name}</span>
             )}
-            {index !== breadcrumbs.length - 1 && <span className="mx-1">/</span>} {/* Separator */}
+            {index !== breadcrumbs.length - 1 && <span className="mx-1">/</span>}
           </li>
         ))}
       </ul>
@@ -102,4 +103,4 @@ const LeaseBreadcrumb: React.FC<LeaseBreadcrumbProps> = ({ lease }) => {
   );
 };
 
-export default LeaseBreadcrumb;
+export default RegulationBreadcrumb;

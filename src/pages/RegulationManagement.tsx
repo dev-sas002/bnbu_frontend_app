@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import RegulationBreadcrumb from '@/components/RegulationBreadcrumb';
 
 const RegulationManagement = () => {
   const [page, setPage] = useState(1);
@@ -69,8 +70,13 @@ const RegulationManagement = () => {
   return (
     <Layout>
       <div className="p-4 flex-1 bg-white w-full mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0">
-          <h2 className="text-xl font-semibold">Your Regulation Searches</h2>
+        <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+          <div className="flex flex-col items-center md:items-start">
+            <h2 className="text-xl font-bold">Your Regulation Searches</h2>
+            <div>
+              <RegulationBreadcrumb />
+            </div>
+          </div>
           <button
             onClick={handleNewSearch} // Handle new search click
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
