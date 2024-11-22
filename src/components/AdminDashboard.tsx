@@ -71,11 +71,13 @@ const AdminDashboard: React.FC = () => {
   if (isError) return <div>Error loading users</div>;
 
   return (
-    <div className="space-y-10 p-5">
-      <div>
-        <div className="flex justify-end">
+    <div className="p-4 flex-1 bg-white w-full mx-auto">
+      <div className="flex flex-col md:flex-row md:justify-between items-center mb-4 space-y-2 md:space-y-0 mt-7">
+        <div className="flex flex-col items-center md:items-start">
+            <h2 className="text-xl font-bold">Dashboard</h2> 
+        </div>
         <button
-          className="bg-red-500 text-white px-4 py-2 rounded"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
           onClick={() => {
             setIsCreating(true);
             setIsModalOpen(true);
@@ -84,7 +86,7 @@ const AdminDashboard: React.FC = () => {
           >
           Create New User
         </button>
-        </div>
+      </div>
 
         <Modal isOpen={isModalOpen} onClose={() => {
           setIsModalOpen(false);
@@ -123,8 +125,7 @@ const AdminDashboard: React.FC = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
         />
-      </div>
-      <div>
+      <div className='p-10 flex-1 bg-white w-full mx-auto'>
         <h2 className="text-2xl font-bold mb-4">User Statistics for Page {currentPage}</h2>
         <Chart data={userList} /> {/* Use local state for user statistics */}
       </div>

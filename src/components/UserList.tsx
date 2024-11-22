@@ -64,11 +64,12 @@ const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage
             ))}
           </tbody>
         </table>
-        <div className="flex justify-between p-5 bg-white">
+      </div>
+      <div className="flex justify-between items-center mt-4">
           <button
             onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-red-700 text-white rounded disabled:opacity-50"
+            className="px-4 py-2 bg-red-500 text-white rounded disabled:opacity-50 hover:bg-red-600"
           >
             Previous
           </button>
@@ -76,11 +77,10 @@ const UserList: React.FC<UserListProps> = ({users, onEdit, onDelete, currentPage
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={!users.next}
-            className="px-4 py-2 bg-red-700 text-white rounded disabled:opacity-50"
+            className="px-4 py-2 bg-red-500 text-white rounded disabled:opacity-50 hover:bg-red-600"
           >
             Next
           </button>
-        </div>
       </div>
     </div>
   )
