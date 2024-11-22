@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import icon from '@/assets/images/icon.png';
+import menuicon from '@/assets/images/menuicon.png';
 
 const Sidebar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false); // State for sidebar visibility
@@ -42,9 +43,14 @@ const Sidebar: React.FC = () => {
                 className={`fixed top-16 left-0 bottom-0 bg-gray-300 z-40 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0 md:static md:h-full md:overflow-auto w-64 p-6 h-full`}
             >
                 {/* Close Button for smaller screens */}
-                <button onClick={toggleSidebar} className="md:hidden absolute top-4 right-4 z-50">
+                {/* <button onClick={toggleSidebar} className="md:hidden absolute top-4 right-4 z-50">
                     <FaTimes size={24} />
+                </button> */}
+                {/* Menu icon as close button */}
+                <button onClick={toggleSidebar} className="absolute top-4 right-4 z-50">
+                    <img src={menuicon} alt="menuicon" className="w-5 h-5" />
                 </button>
+
 
                 {/* Your Menu Section */}
                 <div className="flex items-center space-x-2 ml-2 mt-1 mb-3">
