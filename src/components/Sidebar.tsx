@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import icon from '@/assets/images/icon.png';
 
 const Sidebar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false); // State for sidebar visibility
@@ -54,7 +55,10 @@ const Sidebar: React.FC = () => {
                     <ul>
                         {/* Dashboard */}
                         <li onClick={goToDashboardPage} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
-                            <span>🔑</span>
+                            <img src={icon}
+                                alt="icon"
+                                className="w-5 h-5" 
+                            />
                             <span>Dashboard</span>
                         </li>
 
@@ -72,7 +76,10 @@ const Sidebar: React.FC = () => {
 
                         {/* Regulations */}
                         <li onClick={goToRegulationsPage} className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
-                            <span>⚖️</span>
+                            <img src={icon}
+                                alt="icon"
+                                className="w-5 h-5" 
+                            />
                             <span>Regulations</span>
                         </li>
 
@@ -98,7 +105,10 @@ const Sidebar: React.FC = () => {
                         <li
                             onClick={goToLeasePage}
                             className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
-                            <span>📋</span>
+                            <img src={icon}
+                                alt="icon"
+                                className="w-5 h-5" 
+                            />
                             <span>LeaseGuard AI</span>
                         </li>
                     </ul>
