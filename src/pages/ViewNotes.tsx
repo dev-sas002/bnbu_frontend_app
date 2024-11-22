@@ -63,8 +63,25 @@ const ViewNotes = () => {
     }
   }, [toggle, refetchLease, refetchDocument]);
 
-  if (isLoading) return <Layout><div>Loading...</div></Layout>;
-  if (isError || !lease) return <Layout><div>Error loading document details</div></Layout>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (isError || !lease) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading document details</div>
+        </div>
+      </Layout>
+    );
+  }
 
   const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');
   const currentDocument = (lease.documents as Document[]).find(doc => doc.id == Number(documentId));

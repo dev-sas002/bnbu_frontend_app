@@ -3,6 +3,7 @@ import { useChatWithGptMutation, useGetChatHistoryQuery } from '../services/api'
 import dayjs from 'dayjs';
 import { Lease } from '@/types/leaseTypes';
 import ReactMarkdown from 'react-markdown';
+import Layout from './Layout';
 
 interface Message {
   text: string;
@@ -108,7 +109,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
   }, [data, data?.gpt_response?.message, summary, data?.gpt_response.timestamp, documentId, lease]);
 
   if (error) {
-    return <div>Error loading chat history.</div>;
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading chat history.</div>
+        </div>
+      </Layout>
+    );
   }
 
   // Group messages by pairs and reverse the groups

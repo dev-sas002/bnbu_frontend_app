@@ -83,8 +83,25 @@ const LeaseDetail = () => {
     }
   };
   
-  if (isLoading) return <Layout><div>Loading...</div></Layout>;
-  if (isError || !lease) return <Layout><div>Error loading lease details</div></Layout>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (isError || !lease) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading lease details</div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Concatenate address1 and address2, handling null or empty case for address2
   const fullAddress = lease.address1 + (lease.address2 ? `, ${lease.address2}` : '');

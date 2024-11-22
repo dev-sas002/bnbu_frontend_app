@@ -4,6 +4,7 @@ import { Regulation } from '@/types/regulationTypes';
 import dayjs from 'dayjs';
 import ReactMarkdown from 'react-markdown';
 import RegulationBreadcrumb from './RegulationBreadcrumb';
+import Layout from './Layout';
 
 interface Message {
   text: string;
@@ -111,7 +112,13 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
   }, [data, data?.gpt_response?.message, summary, data?.gpt_response.timestamp, regulation.id]);
 
   if (error) {
-    return <div>Error loading regulation chat history.</div>;
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading regulation chat history.</div>
+        </div>
+      </Layout>
+    );
   }
 
   // Group messages by pairs and reverse the groups

@@ -109,11 +109,23 @@ const LeaseManagement = () => {
   };
 
   if (isLoading) {
-    return <Layout><div>Loading...</div></Layout>;
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
   }
-
+  
   if (isError) {
-    return <Layout><div>Error loading leases</div></Layout>;
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading leases</div>
+        </div>
+      </Layout>
+    );
   }
 
   return (

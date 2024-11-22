@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { useGetUserProfileQuery} from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import Layout from './Layout';
 
 const UserDashboard: React.FC = () => {
   const { data: user, isLoading } = useGetUserProfileQuery(undefined);
@@ -13,12 +14,25 @@ const UserDashboard: React.FC = () => {
   console.log('User:', user);
 
   if (isLoading) {
-    return <div>Loading user information...</div>;
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading user information...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (!user) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">No user information available.</div>
+        </div>
+      </Layout>
+    );
   }
 
-  if (!user) {
-    return <div>No user information available.</div>;
-  }
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg max-w-4xl pt-8 p-4 h-full sm:p-6 lg:p-8 mx-auto">

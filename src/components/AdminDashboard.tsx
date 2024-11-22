@@ -8,6 +8,7 @@ import Chart from './Chart';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Modal from './Modal';
+import Layout from './Layout';
 
 const AdminDashboard: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,8 +68,25 @@ const AdminDashboard: React.FC = () => {
     refetch(); // Fetch data on component mount and when currentPage changes
   }, [currentPage, refetch]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading users</div>;
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  if (isError) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading users</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <div className="p-4 flex-1 bg-white w-full mx-auto">

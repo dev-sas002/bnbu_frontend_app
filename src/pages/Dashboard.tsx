@@ -11,11 +11,23 @@ const Dashboard: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
 
   if (isLoading) {
-    return <Layout><div>Loading...</div></Layout>; // Keep the layout wrapper even for loading state
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-gray-700">Loading...</div>
+        </div>
+      </Layout>
+    );
   }
-
+  
   if (isError) {
-    return <Layout><div>Error loading data. Please try again.</div></Layout>; // Keep the layout for consistency
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-full w-full">
+          <div className="text-lg text-red-500">Error loading data. Please try again.</div>
+        </div>
+      </Layout>
+    );
   }
 
   if (isSuccess && data) {
