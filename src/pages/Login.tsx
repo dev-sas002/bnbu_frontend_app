@@ -79,7 +79,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-20 sm:px-6 lg:px-20">
+    <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center bg-gray-50 py-12 px-6 sm:px-6 lg:px-20">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">Log in</h2>
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
           </div>
         </form>
       </div>
-      <div>
+      <div className="hidden lg:block">
         <img src={Olsi} alt="Olsi" className="h-auto w-3/4 mx-auto ml-60" />
       </div>
     </div>
