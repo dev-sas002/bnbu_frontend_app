@@ -11,7 +11,7 @@ const UserDashboard: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);
-  console.log('User:', user);
+  // console.log('User:', user);
 
   if (isLoading) {
     return (

@@ -69,7 +69,7 @@ const LeaseManagement = () => {
         // Review all documents at once using the reviewDocuments mutation
         await reviewDocuments({ documentIds });
         dispatch(toggleRefreshDocuments()) 
-        console.log(`All documents reviewed.`);
+        // console.log(`All documents reviewed.`);
       } catch (reviewError) {
         console.error(`Error reviewing documents:`, reviewError);
         toast.error('Failed to review documents');

@@ -27,7 +27,7 @@ const DocumentPreview: React.FC = () => {
                   'Authorization': `Bearer ${token}`,
               },
           });
-          console.log("response:", response);
+        //   console.log("response:", response);
           if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
           }

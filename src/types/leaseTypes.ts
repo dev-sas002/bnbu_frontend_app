@@ -22,5 +22,3 @@ export interface Lease {
   documents?: Document[];
 }
 
-
-// import { Lease, Document } from '../types/leaseTypes';

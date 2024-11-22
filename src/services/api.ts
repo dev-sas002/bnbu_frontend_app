@@ -10,7 +10,7 @@ export const api = createApi({
       if (!token){
         token = localStorage.getItem("token")
       }
-      console.log("===> ",token)
+      // console.log("===> ",token)
       if (token) {
         headers.set('authorization', `Bearer ${token}`)
       }
@@ -108,12 +108,6 @@ export const api = createApi({
         method: 'POST',
       }),
     }),
-
-    // Lease API endpoints
-    // Get all leases
-    // getAllLeases: builder.query({
-    //   query: () => 'api/leases/',
-    // }),
 
     // Fetch all leases with pagination
     getAllLeases: builder.query({
@@ -224,24 +218,6 @@ export const api = createApi({
 
 
     // Chat with GPT about a specific document by document ID
-    // chatWithGpt: builder.mutation({
-    //   query: ({ documentId, message }) => ({
-    //     url: `api/documents/${documentId}/chat/`,  // Endpoint for chat action
-    //     method: 'POST',
-    //     body: { message },
-    //   }),
-    // }),
-
-    // Chat with GPT about a specific document by document ID
-    // chatWithGpt: builder.mutation({
-    //   query: ({ documentId, message }) => ({
-    //     url: `api/documents/${documentId}/chat/`, // Endpoint for chat action
-    //     method: 'POST',
-    //     body: { message },
-    //   }),
-    // }),
-
-    // Chat with GPT about a specific document by document ID
     chatWithGpt: builder.mutation({
       query: ({ documentId, message }) => ({
         url: `/api/documents/${documentId}/chat/`, // Endpoint for chat action
@@ -263,22 +239,6 @@ export const api = createApi({
         },
       }),
     }),
-
-    // Regulations: Fetch list of regulations
-    // getRegulations: builder.query({
-    //   query: () => ({
-    //     url: '/api/regulations/',
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   }),
-    // }),
-
-    // getRegulations: builder.query({
-    //   query: (page = 1) => `api/regulations/?page=${page}`, // Include page number in query
-    //   keepUnusedDataFor: 0, // Prevent caching
-    // }),
 
     getRegulations: builder.query({
       query: (page = 1) => ({

@@ -49,14 +49,14 @@ const LeaseDetail = () => {
   // Update the upload logic in LeaseDetail to convert Lease to FormData
   const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
-      console.log("FormData being sent:", Array.from(formData.entries()));
+      // console.log("FormData being sent:", Array.from(formData.entries()));
       
       // Store the timestamp of the latest document before the revision upload
       const lastUploadedAt = documents?.length > 0 ? new Date(documents[documents.length - 1].uploaded_at).getTime() : 0;
   
       // Start uploading the revision
       const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
-      console.log("Uploaded Lease Status:", uploadedLeaseStatus);
+      // console.log("Uploaded Lease Status:", uploadedLeaseStatus);
   
       setUploadModalOpen(false);
       refetch();  // Fetch the updated lease data
@@ -68,7 +68,7 @@ const LeaseDetail = () => {
           try {
             await reviewDocuments({ documentIds });
             dispatch(toggleRefreshDocuments())
-            console.log(`New documents reviewed.`);
+            // console.log(`New documents reviewed.`);
           } catch (reviewError) {
             console.error(`Error reviewing documents:`, reviewError);
             toast.error('Failed to review documents');
@@ -165,7 +165,7 @@ const LeaseDetail = () => {
                     </td>
                     <td className="px-4 md:px-6 py-3 text-sm md:text-base whitespace-nowrap">
                       <button onClick={() => {
-                          console.log("Button clicked, navigating to preview");
+                          // console.log("Button clicked, navigating to preview");
                           navigate(`/preview/${doc.id}`);
                           }} className="text-red-500 hover:underline">
                           View Document

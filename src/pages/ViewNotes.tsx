@@ -30,7 +30,7 @@ const ViewNotes = () => {
 
   const handleUploadRevision = async (leaseId: number, formData: FormData) => {
     try {
-      console.log("FormData being sent:", Array.from(formData.entries()));
+      // console.log("FormData being sent:", Array.from(formData.entries()));
       const uploadedLeaseStatus = await reviseLease({ id: leaseId, revisedData: formData }).unwrap();
       setUploadModalOpen(false);
       
@@ -44,7 +44,7 @@ const ViewNotes = () => {
         try {
           await reviewDocuments({ documentIds });
           dispatch(toggleRefreshDocuments());
-          console.log("Documents reviewed successfully.");
+          // console.log("Documents reviewed successfully.");
         } catch (reviewError) {
           console.error("Error reviewing documents:", reviewError);
           toast.error('Failed to review documents');
