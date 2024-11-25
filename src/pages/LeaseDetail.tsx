@@ -10,6 +10,7 @@ import { toggleRefreshDocuments } from '../store/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
+import UploadIcon from '@/assets/images/UploadIcon.png';
 
 const formatDate = (dateString: string) => {
   // If the dateString is null or undefined, return "Invalid Date"
@@ -119,9 +120,10 @@ const LeaseDetail = () => {
           </div>
           <button
             onClick={() => setUploadModalOpen(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 flex items-center space-x-2"
           >
-            Upload Revision
+            <img src={UploadIcon} alt="Upload Revision Icon" className='w-5 h-5'/>
+            <span>Upload Revision</span>
           </button>
         </div>
         

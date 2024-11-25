@@ -3,6 +3,7 @@ import Modal from './Modal';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
+import UploadIcon from '@/assets/images/UploadIcon.png';
 
 interface UploadLeaseModalProps {
   isOpen: boolean;
@@ -185,10 +186,11 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
       <div className="flex justify-between mt-4">
         <button
           onClick={handleUpload}
-          className="upload-button bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-2"
+          className="upload-button bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-3 flex items-center space-x-2"
           disabled={isUploading}
         >
-          {isEditMode ? 'Save Changes' : 'Analyze Lease'}
+          {!isEditMode && <img src={UploadIcon} alt="Upload Icon" className="w-5 h-5" />}
+          <span>{isEditMode ? 'Save Changes' : 'Analyze Lease'}</span>
         </button>
         <button
           onClick={onClose}

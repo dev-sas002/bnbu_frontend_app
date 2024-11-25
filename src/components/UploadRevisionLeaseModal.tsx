@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
+import UploadIcon from '@/assets/images/UploadIcon.png';
 
 interface UploadRevisionLeaseModalProps {
   isOpen: boolean;
@@ -94,10 +95,11 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
         <div className="flex justify-between mt-4">
           <button
             onClick={handleUpload}
-            className="bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-2"
+            className="bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-3 flex items-center space-x-2"
             disabled={isUploading}
           >
-            {isUploading ? 'Uploading...' : 'Upload Revision'}
+            {!isUploading && <img src={UploadIcon} alt="Upload Icon" className="w-5 h-5" />}
+            <span>{isUploading ? 'Uploading...' : 'Upload Revision'}</span>
           </button>
           <button
             onClick={onClose}
