@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import icon from '@/assets/images/icon.png';
 import menuicon from '@/assets/images/menuicon.png';
 
 const Sidebar: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false); // State for sidebar visibility
+    const [isOpen, setIsOpen] = useState<boolean>(true); // Default state as open
     const navigate = useNavigate(); // Hook to handle navigation
 
     const toggleSidebar = () => {
@@ -14,33 +13,53 @@ const Sidebar: React.FC = () => {
 
     const goToLeasePage = () => {
       navigate('/leases'); // Navigate to Lease Management page
-      setIsOpen(false); // Close sidebar after navigation
   };
 
     const goToDashboardPage = () => {
         navigate('/dashboard'); // Navigate to Lease Management page
-        setIsOpen(false); // Close sidebar after navigation
     };
 
     const goToRegulationsPage = () => {
         navigate('/regulations'); // Navigate to Regulations page
-        setIsOpen(false); // Close sidebar after navigation
     };
+
+    // Detect screen size and adjust sidebar visibility on load and resize
+    useEffect(() => {
+        const handleResize = () => {
+        if (window.innerWidth <= 768 && isOpen) {
+            setIsOpen(false); // Close the sidebar on smaller screens
+        } else {
+            if (!isOpen) {
+                setIsOpen(true); // Open the sidebar on larger screens
+            }
+        }
+        };
+
+        handleResize(); // Initial check on component mount
+
+        window.addEventListener('resize', handleResize); // Listen for resize events
+
+        return () => {
+        window.removeEventListener('resize', handleResize); // Cleanup listener on unmount
+        };
+    }, []);
 
 
     return (
         <div>
             {/* Hamburger Icon below the header */}
-            <div className="md:hidden fixed top-16 left-4 z-50">
+            <div className="fixed top-16 z-50">
                 <button onClick={toggleSidebar} className="p-4">
-                  {/* Display FaBars if closed */}
-                    {!isOpen && <FaBars size={24} />}
+                  {/* Display menuicon if closed */}
+                  {!isOpen && <img src={menuicon} alt="menuicon" className="w-5 h-5" />}
                 </button>
             </div>
 
             {/* Sidebar */}
             <aside
-                className={`fixed top-16 left-0 bottom-0 bg-gray-300 z-40 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 md:translate-x-0 md:static md:h-full md:overflow-auto w-64 p-6 h-full`}
+                className={`fixed top-16 md:top-0 left-0 bottom-0 h-full overflow-auto bg-gray-300 z-40 transform transition-transform duration-300 w-64 p-6 ${
+                    isOpen ? 'translate-x-0 md:static' : '-translate-x-full md:absolute md:-translate-x-full'
+                }`}
             >
                 {/* Close Button for smaller screens */}
                 {/* <button onClick={toggleSidebar} className="md:hidden absolute top-4 right-4 z-50">
@@ -86,7 +105,7 @@ const Sidebar: React.FC = () => {
                                 alt="icon"
                                 className="w-5 h-5" 
                             />
-                            <span>Regulations</span>
+                            <span>RegAdvisor AI</span>
                         </li>
 
                         {/* Portfolio Tracker */}

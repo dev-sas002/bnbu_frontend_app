@@ -11,6 +11,7 @@ import { RootState } from '@/store';
 import { Document } from '@/types/leaseTypes';
 import { toast } from 'react-toastify';
 import LeaseBreadcrumb from '@/components/LeaseBreadcrumb';
+import UploadIcon from '@/assets/images/UploadIcon.png';
 
 const ViewNotes = () => {
   const { id, documentId } = useParams<{ id: string; documentId: string }>();
@@ -99,9 +100,10 @@ const ViewNotes = () => {
           </div>
           <button
             onClick={() => setUploadModalOpen(true)}
-            className="bg-red-500 text-white px-4 py-2 lg:mr-7 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-3 lg:mr-7 rounded hover:bg-red-600 flex items-center space-x-2"
           >
-            Upload Revision
+            <img src={UploadIcon} alt="Upload Revision Icon" className='w-5 h-5'/>
+            <span>Upload Revision</span>
           </button>
         </div>
   

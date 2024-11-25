@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Lease } from '../types/leaseTypes';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
+import UploadIcon from '@/assets/images/UploadIcon.png';
 
 interface UploadRevisionLeaseModalProps {
   isOpen: boolean;
@@ -62,7 +63,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-75">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4 text-red-500">Upload Lease Revision</h2>
-        <p className="mb-4">Updating lease for: {leaseData.address1}, {leaseData.city}</p>
+        <p className="mb-4">Uploading lease revision for: {leaseData.address1}, {leaseData.city}</p>
 
         <div
           {...getRootProps()}
@@ -85,7 +86,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
               />
             </svg>
             <p className="text-gray-600">
-              {isDragActive ? 'Drop file here' : files.length > 0 ? `${files.length} file(s) selected` : 'Drop PDF file here or click to select'}
+              {isDragActive ? 'Drop file here' : files.length > 0 ? `${files.length} file(s) selected` : 'Drop or Select File Here'}
             </p>
             <p className="text-xs text-gray-500 mt-2">PDF file only</p>
           </div>
@@ -94,10 +95,11 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
         <div className="flex justify-between mt-4">
           <button
             onClick={handleUpload}
-            className="bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-2"
+            className="bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-3 flex items-center space-x-2"
             disabled={isUploading}
           >
-            {isUploading ? 'Uploading...' : 'Upload Revision'}
+            {!isUploading && <img src={UploadIcon} alt="Upload Icon" className="w-5 h-5" />}
+            <span>{isUploading ? 'Uploading...' : 'Upload Revision'}</span>
           </button>
           <button
             onClick={onClose}

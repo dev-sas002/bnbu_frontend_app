@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'; // Import the useNavigate hook
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import RegulationBreadcrumb from '@/components/RegulationBreadcrumb';
+import SearchIcon from '@/assets/images/SearchIcon.png';
 
 const RegulationManagement = () => {
   const [page, setPage] = useState(1);
@@ -79,9 +80,10 @@ const RegulationManagement = () => {
           </div>
           <button
             onClick={handleNewSearch} // Handle new search click
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 flex items-center space-x-2"
           >
-            New Search
+            <span><img src={SearchIcon} alt="Search Icon" className='w-5 h-5'/></span>
+            <span>New Search</span>
           </button>
         </div>
         <RegulationSearchBar onSearch={handleSearch} />
