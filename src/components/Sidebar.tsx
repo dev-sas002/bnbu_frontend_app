@@ -105,7 +105,7 @@ const Sidebar: React.FC = () => {
                                 alt="icon"
                                 className="w-5 h-5" 
                             />
-                            <span>Regulations</span>
+                            <span>RegAdvisor AI</span>
                         </li>
 
                         {/* Portfolio Tracker */}

@@ -60,7 +60,19 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
     disabled: isEditMode,
   });
 
+  const validateFields = () => {
+    if (!address1 || !city || !state || !zip) {
+      toast.warn('Please fill out all mandatory fields (Address 1, City, State, Zip Code).');
+      return false;
+    }
+    return true;
+  };
+
+
   const handleUpload = async () => {
+    if (!validateFields()) {
+      return; // Stop further processing if validation fails
+    }
     if (!isEditMode && files.length === 0) {
       toast.warn('Please select at least one file to upload.');
       return;
@@ -72,16 +84,16 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
       files.forEach((file, index) => formData.append('documents', file)); // Append all files
       formData.append('address1', address1);
       formData.append('address2', address2);
-      formData.append('city', city);
       formData.append('state', state);
+      formData.append('city', city);
       formData.append('zip_code', zip);
       const newLeaseData: Lease = {
         id: leaseData?.id || 0,
         date: leaseData?.date || '',
         address1: address1,
         address2: address2,
-        city: city,
         state: state,
+        city: city,
         zip_code: zip,
         status: leaseData?.status || 'Draft',
         num_of_docs: leaseData?.num_of_docs || 0,
@@ -127,16 +139,16 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
         />
         <input
           type="text"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="City"
+          value={state}
+          onChange={(e) => setState(e.target.value)}
+          placeholder="State"
           className="modal-input p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <input
           type="text"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          placeholder="State"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="City"
           className="modal-input p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <input
@@ -175,7 +187,7 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
                   ? 'Drop files here'
                   : files.length > 0
                   ? `${files.length} file(s) selected`
-                  : 'Drop PDF files here or click to select'}
+                  : 'Drop or Select File Here'}
               </p>
               <p className="text-xs text-gray-500 mt-2">PDF files only</p>
             </div>

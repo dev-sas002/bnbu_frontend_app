@@ -63,7 +63,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-75">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4 text-red-500">Upload Lease Revision</h2>
-        <p className="mb-4">Updating lease for: {leaseData.address1}, {leaseData.city}</p>
+        <p className="mb-4">Uploading lease revision for: {leaseData.address1}, {leaseData.city}</p>
 
         <div
           {...getRootProps()}
@@ -86,7 +86,7 @@ const UploadRevisionLeaseModal: React.FC<UploadRevisionLeaseModalProps> = ({
               />
             </svg>
             <p className="text-gray-600">
-              {isDragActive ? 'Drop file here' : files.length > 0 ? `${files.length} file(s) selected` : 'Drop PDF file here or click to select'}
+              {isDragActive ? 'Drop file here' : files.length > 0 ? `${files.length} file(s) selected` : 'Drop or Select File Here'}
             </p>
             <p className="text-xs text-gray-500 mt-2">PDF file only</p>
           </div>
