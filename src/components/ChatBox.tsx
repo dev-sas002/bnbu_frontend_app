@@ -4,6 +4,9 @@ import dayjs from 'dayjs';
 import { Lease } from '@/types/leaseTypes';
 import ReactMarkdown from 'react-markdown';
 import Layout from './Layout';
+import usePollingChatHistory from '@/hooks/leasePollingChatHistory';
+import { toggleRefreshDocuments } from '@/store/slices/authSlice';
+import { useDispatch} from 'react-redux';
 
 interface Message {
   text: string;
@@ -22,11 +25,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
   const [summary, setSummary] = useState<string | null>(null);
   const [summaryCreatedTime, setSummaryCreatedTime] = useState<string | null>(null);
   const [isGPTTyping, setIsGPTTyping] = useState(false);
-  
+  const [shouldPoll, setShouldPoll] = useState(true);
+
+  const dispatch = useDispatch();
+
+  const { data, error } = usePollingChatHistory(documentId, shouldPoll);
   const [chatWithGpt, { isLoading: isSendingMessage }] = useChatWithGptMutation();
-  const { data, error, refetch } = useGetChatHistoryQuery(documentId, {
-    skip: !documentId,
-  });
+  const {refetch } = useGetChatHistoryQuery(documentId, { skip: !documentId });
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -46,12 +51,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
       setMessages((prevMessages) => [...prevMessages, newUserMessage]);
       setInput('');
       setIsGPTTyping(true);
+      setShouldPoll(false);
 
       try {
         const response = await chatWithGpt({ documentId, message: input }).unwrap();
-
-        // Refresh chat history after sending a message
-        refetch();
+        refetch(); // Refetch immediately after sending
+        setShouldPoll(true); // Resume polling
 
         const systemResponse: Message = {
           text: response.response,
@@ -91,6 +96,19 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
       }));
   };
 
+  useEffect(() => {
+    // stop polling if doucment is uploaded is more than 20 minutes old, or status is no more pending
+    const old_time = new Date(data?.documnet_uploaded_at).getTime();
+    const time_difference = (new Date().getTime() - old_time) / 1000;
+    const status = data?.gpt_response?.status;
+    if (time_difference > 20 || (status && status !== "Pending")) {
+      setShouldPoll(false);
+      dispatch(toggleRefreshDocuments());
+    }
+  },
+  [shouldPoll, data]);
+
+
   // Fetch chat history on load or when data changes
   useEffect(() => {
     refetch();
@@ -106,7 +124,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ documentId, lease }) => {
         setSummaryCreatedTime(data.gpt_response.timestamp);
       }
     }
-  }, [data, data?.gpt_response?.message, summary, data?.gpt_response.timestamp, documentId, lease]);
+  }, [data, documentId, lease]);
 
   if (error) {
     return (
