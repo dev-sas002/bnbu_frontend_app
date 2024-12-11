@@ -34,7 +34,8 @@ const DocumentPreview: React.FC = () => {
 
             const data = await response.json();
             if (data.file_url) {
-                setDocumentUrl(data.file_url);
+                const secureUrl = data.file_url.replace(/^http:\/\//, 'https://');
+                setDocumentUrl(secureUrl);
                 setError(null);
             } else {
                 throw new Error('File URL not found in response.');
