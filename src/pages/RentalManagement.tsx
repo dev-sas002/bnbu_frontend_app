@@ -45,11 +45,11 @@ const RentalManagement = () => {
       await uploadProperties(file).unwrap();
       dispatch(toggleRefreshRentals())
       setUploadModalOpen(false);
-      toast.success('Properties uploaded successfully!');
+      // toast.success('Properties uploaded successfully!');
       refetch();
     } catch (error) {
       console.error('Failed to upload properties:', error);
-      toast.error('Failed to upload properties');
+      // toast.error('Failed to upload properties');
     }
   };
 
