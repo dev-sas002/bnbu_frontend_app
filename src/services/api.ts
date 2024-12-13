@@ -329,6 +329,57 @@ export const api = createApi({
       },
     }),
 
+    // Upload properties mutation
+    uploadProperties: builder.mutation({
+      query: (file) => ({
+        url: '/api/rental_properties/upload-properties/',
+        method: 'POST',
+        body: file,
+      }),
+    }),
+
+    // Fetch all rental properties with pagination
+    getAllProperties: builder.query({
+      query: (page = 1) => `api/rental_properties/all-properties/?page=${page}`,  // Include page number in query
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+
+
+  // Filtered list of rental properties with pagination
+  filteredList: builder.query({
+    query: (filters) => {
+      const { min_profit, max_profit, status, batch_id, start_date, end_date, page = 1 } = filters || {};
+
+      // Create the payload for the request body
+      const body: Record<string, string> = {
+        min_profit,
+        max_profit,
+        status,
+        batch_id,
+        start_date,
+        end_date,
+        page,
+      };
+
+      // Filter out undefined values from the body
+      Object.keys(body).forEach((key) => {
+        if (body[key] === undefined) {
+          delete body[key];
+        }
+      });
+
+      return {
+        url: `/api/rental_properties/filtered-list/?page=${page}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body), // Include the body in the request
+      };
+    },
+    keepUnusedDataFor: 0, // Prevent caching
+  }),
+
 
 
 
@@ -368,4 +419,7 @@ export const {
   useRegulationchatWithGptMutation,
   useRegulationgetChatHistoryQuery,
   useSearchRegulationsQuery,
+  useUploadPropertiesMutation,
+  useFilteredListQuery,
+  useGetAllPropertiesQuery,
 } = api

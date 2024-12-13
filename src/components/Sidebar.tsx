@@ -22,6 +22,9 @@ const Sidebar: React.FC = () => {
     const goToRegulationsPage = () => {
         navigate('/regulations'); // Navigate to Regulations page
     };
+    const goToRentalAnalyzerPage = () => {
+        navigate('/rental-analyzer'); // Navigate to Rental Analyzer page
+    };
 
     // Detect screen size and adjust sidebar visibility on load and resize
     useEffect(() => {
@@ -135,6 +138,15 @@ const Sidebar: React.FC = () => {
                                 className="w-5 h-5" 
                             />
                             <span>LeaseGuard AI</span>
+                        </li>
+                        <li
+                            onClick={goToRentalAnalyzerPage}
+                            className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
+                            <img src={icon}
+                                alt="icon"
+                                className="w-5 h-5" 
+                            />
+                            <span>Rental Analyzer</span>
                         </li>
                     </ul>
                 </nav>
