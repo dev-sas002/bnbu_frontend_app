@@ -9,7 +9,8 @@ import { toggleRefreshRentals } from '@/store/slices/authSlice';
 import{ useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { toast } from 'react-toastify';
-import UploadIcon from '@/assets/images/UploadIcon.png';
+import download from '@/assets/images/download.png';
+import upload from '@/assets/images/upload.png';
 
 
 const RentalManagement = () => {
@@ -89,13 +90,22 @@ const RentalManagement = () => {
           <div className="flex flex-col items-center md:items-start">
             <h2 className="text-xl font-bold">Your Rental Properties</h2>
           </div>
-          <button
-            onClick={() => setUploadModalOpen(true)}
-            className="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 flex items-center space-x-2"
-          >
-            <img src={UploadIcon} alt="Upload Revision Icon" className="w-5 h-5" />
-            <span>Upload Properties</span>
-          </button>
+          <div className="flex flex-ccol justify-end items-center space-x-2">
+            <button
+              onClick={() => setUploadModalOpen(true)}
+              className="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 flex items-center space-x-2"
+            >
+              <img src={download} alt="Download Icon" className="w-5 h-5"/>
+              <span>Download CSV</span>
+            </button>
+            <button
+              onClick={() => setUploadModalOpen(true)}
+              className="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 flex items-center space-x-2"
+            >
+              <img src={upload} alt="Upload Icon" className="w-5 h-5" />
+              <span>Upload Properties</span>
+            </button>
+          </div>
         </div>
         <RentalSearchBar onSearch={handleSearch} />
         <RentalTable rentals={displayedRentals} />

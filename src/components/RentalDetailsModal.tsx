@@ -31,7 +31,9 @@ const RentalDetailsModal: React.FC<RentalDetailsModalProps> = ({ rental, onClose
           {[
             { label: "Date", value: rental.created_at_formatted },
             { label: "Batch ID", value: rental.batch_id },
-            { label: "Address", value: rental.location },
+            { label: "Location", value: rental.location },
+            { label: "Rent", value: rental.rent },
+            { label: "Square Feet", value: rental.square_feet },
             { label: "Bedrooms", value: rental.no_of_bedrooms },
             { label: "Bathrooms", value: rental.no_of_bathrooms },
             {
