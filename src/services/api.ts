@@ -380,7 +380,47 @@ export const api = createApi({
       keepUnusedDataFor: 0, // Prevent caching
     }),
 
+    // downloadCsv query based on filters (GET method)
+    downloadCsv: builder.query({
+      query: (filters) => {
+        const { min_profit, max_profit, status, batch_id, start_date, end_date } = filters || {};
+        
+        // Prepare the query parameters
+        const queryParams: Record<string, string> = {};
+        if (min_profit) queryParams.min_profit = min_profit;
+        if (max_profit) queryParams.max_profit = max_profit;
+        if (status) queryParams.status = status;
+        if (batch_id) queryParams.batch_id = batch_id;
+        if (start_date) queryParams.start_date = start_date;
+        if (end_date) queryParams.end_date = end_date;
 
+        return {
+          url: `api/rental_properties/download-csv/`,
+          method: 'GET',
+          params: queryParams,
+          responseHandler: async (response) => {
+            // Ensure the response is in text (CSV) format
+            const csvText = await response.text();
+            return csvText;
+          },
+        };
+      },
+    }),
+
+    // Fetch task result by task_id
+    getTaskResult: builder.query({
+      query: (task_id) => {
+        if (!task_id) {
+          throw new Error("Task ID is required");
+        }
+
+        return {
+          url: `/api/rental_properties/task-result/?task_id=${task_id}`,
+          method: 'GET',
+        };
+      },
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
 
 
   }),
@@ -422,4 +462,6 @@ export const {
   useUploadPropertiesMutation,
   useFilteredListQuery,
   useGetAllPropertiesQuery,
+  useDownloadCsvQuery,
+  useGetTaskResultQuery
 } = api

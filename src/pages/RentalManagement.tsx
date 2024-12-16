@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import RentalTable from '../components/RentalTable';
 import RentalSearchBar from '../components/RentalSearchBar';
 import UploadRentalModal from '../components/UploadRentalModal';
-import { useFilteredListQuery, useUploadPropertiesMutation } from '../services/api';
+import { useFilteredListQuery, useUploadPropertiesMutation, useDownloadCsvQuery } from '../services/api';
 import Layout from '../components/Layout';
 import { RentalProperty } from '@/types/rentalTypes';
 import { toggleRefreshRentals } from '@/store/slices/authSlice';
-import{ useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { toast } from 'react-toastify';
 import download from '@/assets/images/download.png';
@@ -32,19 +32,21 @@ const RentalManagement = () => {
     page,
   });
 
-  const toggle = useSelector((state: RootState) => state.auth.refreshDocuments);
+  const { data: csvData, error: csvError, isLoading: csvLoading } = useDownloadCsvQuery(searchFilters);
+
+  const toggle = useSelector((state: RootState) => state.auth.refreshRentals);
   useEffect(() => {
     refetch();
-  }, [toggle])
+  }, [toggle, refetch]);
 
   const displayedRentals = filteredRentals?.results || [];
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleUploadRental = async (file: FormData) => {
     try {
       await uploadProperties(file).unwrap();
-      dispatch(toggleRefreshRentals())
+      dispatch(toggleRefreshRentals());
       setUploadModalOpen(false);
       // toast.success('Properties uploaded successfully!');
       refetch();
@@ -61,6 +63,25 @@ const RentalManagement = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+  };
+
+  const handleDownloadCsv = (csvData: string | null) => {
+    if (csvData) {
+      const blob = new Blob([csvData], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'rental_properties.csv'; // This will be the file name for the download
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      
+      // Show success toast
+      toast.success('CSV download successful!');
+    } else {
+      console.error('Error: No CSV data found');
+      toast.error('Error downloading CSV');
+    }
   };
 
   if (isLoading) {
@@ -90,9 +111,9 @@ const RentalManagement = () => {
           <div className="flex flex-col items-center md:items-start">
             <h2 className="text-xl font-bold">Your Rental Properties</h2>
           </div>
-          <div className="flex flex-ccol justify-end items-center space-x-2">
+          <div className="flex flex-row justify-end items-center space-x-2">
             <button
-              onClick={() => setUploadModalOpen(true)}
+              onClick={() => handleDownloadCsv(csvData)}
               className="bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 flex items-center space-x-2"
             >
               <img src={download} alt="Download Icon" className="w-5 h-5"/>
