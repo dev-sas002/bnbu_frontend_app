@@ -12,6 +12,7 @@ import Layout from './components/Layout';
 import RegulationManagement from './pages/RegulationManagement';
 import RegulationDetail from './pages/RegulationDetail';
 import ViewRegulationChat from './pages/ViewRegulationChat';
+import RentalManagement from './pages/RentalManagement';
 
 const App: React.FC = () => {
   return (
@@ -83,6 +84,12 @@ const App: React.FC = () => {
             <ViewRegulationChat />  {/* Updated Regulation Chat Route */}
           </PrivateRoute>
         }
+      />
+      <Route path="/rental-analyzer" element={
+          <PrivateRoute>
+            <RentalManagement /> 
+          </PrivateRoute>
+        } 
       />
 
     </Routes>

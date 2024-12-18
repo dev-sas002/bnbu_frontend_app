@@ -6,6 +6,7 @@ export interface AuthState {
   token: string | null
   refreshDocuments: boolean
   refreshRegulations: boolean
+  refreshRentals: boolean
 }
 
 export interface User {
@@ -26,7 +27,8 @@ const initialState: AuthState = {
   user: user,
   token: token,
   refreshDocuments: false,
-  refreshRegulations:false
+  refreshRegulations:false,
+  refreshRentals:false
 }
 
 const authSlice = createSlice({
@@ -68,9 +70,15 @@ const authSlice = createSlice({
     },
     setRefreshRegulations: (state, action: PayloadAction<boolean>) => {
       state.refreshRegulations = action.payload
-    }
+    },
+    toggleRefreshRentals: (state) => {
+      state.refreshRentals = !state.refreshRentals
+    },
+    setRefreshRentals: (state, action: PayloadAction<boolean>) => {
+      state.refreshRentals = action.payload
+    },
   },
 })
 
-export const { setCredentials, setToken, logout, toggleRefreshDocuments, setRefreshDocuments, toggleRefreshRegulations, setRefreshRegulations } = authSlice.actions
+export const { setCredentials, setToken, logout, toggleRefreshDocuments, setRefreshDocuments, toggleRefreshRegulations, setRefreshRegulations, toggleRefreshRentals, setRefreshRentals } = authSlice.actions
 export default authSlice.reducer

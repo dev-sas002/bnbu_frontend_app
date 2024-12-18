@@ -329,7 +329,98 @@ export const api = createApi({
       },
     }),
 
+    // Upload properties mutation
+    uploadProperties: builder.mutation({
+      query: (file) => ({
+        url: '/api/rental_properties/upload-properties/',
+        method: 'POST',
+        body: file,
+      }),
+    }),
 
+    // Fetch all rental properties with pagination
+    getAllProperties: builder.query({
+      query: (page = 1) => `api/rental_properties/all-properties/?page=${page}`,  // Include page number in query
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+
+
+    // Filtered list of rental properties with pagination
+    filteredList: builder.query({
+      query: (filters) => {
+        const { min_profit, max_profit, status, batch_id, start_date, end_date, page = 1 } = filters || {};
+
+        // Create the payload for the request body
+        const body: Record<string, string> = {
+          min_profit,
+          max_profit,
+          status,
+          batch_id,
+          start_date,
+          end_date,
+          page,
+        };
+
+        // Filter out undefined values from the body
+        Object.keys(body).forEach((key) => {
+          if (body[key] === undefined) {
+            delete body[key];
+          }
+        });
+
+        return {
+          url: `/api/rental_properties/filtered-list/?page=${page}`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body), // Include the body in the request
+        };
+      },
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+
+    // downloadCsv query based on filters (GET method)
+    downloadCsv: builder.query({
+      query: (filters) => {
+        const { min_profit, max_profit, status, batch_id, start_date, end_date } = filters || {};
+        
+        // Prepare the query parameters
+        const queryParams: Record<string, string> = {};
+        if (min_profit) queryParams.min_profit = min_profit;
+        if (max_profit) queryParams.max_profit = max_profit;
+        if (status) queryParams.status = status;
+        if (batch_id) queryParams.batch_id = batch_id;
+        if (start_date) queryParams.start_date = start_date;
+        if (end_date) queryParams.end_date = end_date;
+
+        return {
+          url: `api/rental_properties/download-csv/`,
+          method: 'GET',
+          params: queryParams,
+          responseHandler: async (response) => {
+            // Ensure the response is in text (CSV) format
+            const csvText = await response.text();
+            return csvText;
+          },
+        };
+      },
+    }),
+
+    // Fetch task result by task_id
+    getTaskResult: builder.query({
+      query: (task_id) => {
+        if (!task_id) {
+          throw new Error("Task ID is required");
+        }
+
+        return {
+          url: `/api/rental_properties/task-result/?task_id=${task_id}`,
+          method: 'GET',
+        };
+      },
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
 
 
   }),
@@ -368,4 +459,9 @@ export const {
   useRegulationchatWithGptMutation,
   useRegulationgetChatHistoryQuery,
   useSearchRegulationsQuery,
+  useUploadPropertiesMutation,
+  useFilteredListQuery,
+  useGetAllPropertiesQuery,
+  useDownloadCsvQuery,
+  useGetTaskResultQuery
 } = api
