@@ -30,9 +30,9 @@ const RentalRow: React.FC<RentalRowProps> = ({ rental, onClick, index }) => {
         <span
           title={rental.property_status}
           className={`px-2 py-1 rounded ${
-            rental.property_status.toLowerCase() === RentalPropertyStatus.Approved.toLowerCase() ? "bg-green-300 text-green-800" 
-            : rental.property_status.toLowerCase() === RentalPropertyStatus.Pending.toLowerCase() ? "bg-yellow-300 text-yellow-800" 
-            : rental.property_status.toLowerCase() === RentalPropertyStatus.Rejected.toLowerCase() ? "bg-red-300 text-red-800" 
+            rental.property_status === RentalPropertyStatus.Approved ? "bg-green-300 text-green-800" 
+            : rental.property_status === RentalPropertyStatus.Pending ? "bg-yellow-300 text-yellow-800" 
+            : rental.property_status === RentalPropertyStatus.Rejected ? "bg-red-300 text-red-800" 
             : "bg-gray-300 text-gray-800"
           }`}
         >

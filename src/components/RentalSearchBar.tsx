@@ -101,10 +101,10 @@ const RentalSearchBar: React.FC<RentalSearchBarProps> = ({ onSearch }) => {
             className="p-2 border rounded-lg bg-gray-50 w-full appearance-none pr-8"
           >
             <option value="">Select Status</option>
-            <option value={RentalPropertyStatus.Pending.toLowerCase()}>Pending</option>
-            <option value={RentalPropertyStatus.Approved.toLowerCase()}>Approved</option>
-            <option value={RentalPropertyStatus.Rejected.toLowerCase()}>Rejected</option>
-            <option value={RentalPropertyStatus.Error.toLowerCase()}>Error</option>
+            {/* <option value={RentalPropertyStatus.Pending}>Pending</option> */}
+            <option value={RentalPropertyStatus.Approved}>Approved</option>
+            <option value={RentalPropertyStatus.Rejected}>Rejected</option>
+            <option value={RentalPropertyStatus.Error}>Error</option>
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

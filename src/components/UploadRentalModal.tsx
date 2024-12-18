@@ -9,15 +9,16 @@ interface UploadRentalModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpload: (formData: FormData) => void;
+  loading: boolean; // Added loading prop to reflect upload progress
 }
 
 const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
   isOpen,
   onClose,
   onUpload,
+  loading,
 }) => {
   const [files, setFiles] = useState<File[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -42,19 +43,16 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
     }
 
     try {
-      setIsUploading(true);
       const formData = new FormData();
       formData.append('file', files[0]);
 
       // Call the upload function with the formData
       await onUpload(formData);
-      toast.success('Rental data uploaded successfully!');
+      toast.success('Rental data file uploaded. Processing started.');
       onClose();
     } catch (error) {
-      console.error('Failed to upload rental data:', error);
-      toast.error('Failed to upload rental data.');
-    } finally {
-      setIsUploading(false);
+      console.error('Failed to upload rental data file:', error);
+      toast.error('Failed to upload rental data file.');
     }
   };
 
@@ -97,7 +95,7 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
         </div>
       </div>
 
-      {isUploading && (
+      {loading && (
         <div className="mt-4">
           <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full bg-red-500 animate-pulse" style={{ width: '100%' }}></div>
@@ -109,9 +107,9 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
         <button
           onClick={handleUpload}
           className="upload-button bg-red-500 text-white hover:bg-red-600 rounded-lg px-4 py-3 flex items-center space-x-2"
-          disabled={isUploading}
+          disabled={loading}
         >
-          {!isUploading && <img src={UploadIcon} alt="Upload Icon" className="w-5 h-5" />}
+          {!loading && <img src={UploadIcon} alt="Upload Icon" className="w-5 h-5" />}
           <span>Upload</span>
         </button>
         <button
