@@ -49,6 +49,7 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
       // Call the upload function with the formData
       await onUpload(formData);
       toast.success('Rental data file uploaded. Processing started.');
+      setFiles([]); // Clear files after successful upload
       onClose();
     } catch (error) {
       console.error('Failed to upload rental data file:', error);
