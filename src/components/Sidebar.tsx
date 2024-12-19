@@ -139,7 +139,7 @@ const Sidebar: React.FC = () => {
                             />
                             <span>LeaseGuard AI</span>
                         </li>
-                        {/* <li
+                        <li
                             onClick={goToRentalAnalyzerPage}
                             className="flex items-center space-x-2 cursor-pointer text-gray-700 hover:text-black hover:font-bold hover:bg-gray-400 transition-colors duration-200 p-2 rounded whitespace-nowrap">
                             <img src={icon}
@@ -147,7 +147,7 @@ const Sidebar: React.FC = () => {
                                 className="w-5 h-5" 
                             />
                             <span>Rental Analyzer</span>
-                        </li> */}
+                        </li>
                     </ul>
                 </nav>
             </aside>
