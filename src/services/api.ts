@@ -422,6 +422,22 @@ export const api = createApi({
       keepUnusedDataFor: 0, // Prevent caching
     }),
 
+    // Fetch task progress by task_id
+    taskProgress: builder.query({
+      query: (task_id) => {
+        if (!task_id) {
+          throw new Error("Task ID is required");
+        }
+
+        return {
+          url: `/api/rental_properties/task-progress/?task_id=${task_id}`,
+          method: 'GET',
+        };
+      },
+      keepUnusedDataFor: 0, // Prevent caching
+    }),
+
+
 
   }),
 })
@@ -463,5 +479,7 @@ export const {
   useFilteredListQuery,
   useGetAllPropertiesQuery,
   useDownloadCsvQuery,
-  useGetTaskResultQuery
+  useGetTaskResultQuery,
+  useTaskProgressQuery,
+
 } = api
