@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Modal from './Modal';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
@@ -57,6 +57,12 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) {
+      setFiles([]);
+    }
+  }, [isOpen]);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <h3 className="modal-title text-lg font-semibold mb-4 text-red-500">
@@ -114,7 +120,10 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
           <span>Upload</span>
         </button>
         <button
-          onClick={onClose}
+          onClick={() => {
+            setFiles([]);
+            onClose();
+          }}
           className="cancel-button bg-gray-500 text-white hover:bg-gray-600 rounded-lg px-4 py-2"
         >
           Cancel
