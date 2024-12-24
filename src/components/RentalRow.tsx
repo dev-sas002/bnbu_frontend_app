@@ -5,13 +5,13 @@ import { RentalProperty, RentalPropertyStatus } from '../types/rentalTypes';
 interface RentalRowProps {
   rental: RentalProperty;
   onClick: () => void;
-  index: number;
+  // index: number;
 }
 
-const RentalRow: React.FC<RentalRowProps> = ({ rental, onClick, index }) => {
+const RentalRow: React.FC<RentalRowProps> = ({ rental, onClick}) => {
   return (
     <tr onClick={onClick} className="hover:bg-gray-50 cursor-pointer">
-      <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index}</td>
+      {/* <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{index}</td> */}
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{rental.created_at_formatted || 'N/A'}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">{rental.location || 'N/A'}</td>
       <td className="px-4 md:px-6 py-2 text-sm md:text-base whitespace-nowrap">${rental.rent?.toLocaleString() || 'N/A'}</td>
