@@ -13,6 +13,7 @@ import upload from '@/assets/images/upload.png';
 
 const RentalManagement = () => {
   const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isUploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadProperties] = useUploadPropertiesMutation();
 
@@ -28,6 +29,7 @@ const RentalManagement = () => {
   const { data: filteredRentals, refetch, isLoading } = useFilteredListQuery({
     ...searchFilters,
     page,
+    pageSize: rowsPerPage, // Send the rows per page to the API
   });
 
   const { data: csvData, refetch: refetchCsvData } = useDownloadCsvQuery(searchFilters);
@@ -52,7 +54,7 @@ const RentalManagement = () => {
 
   useEffect(() => {
     refetch();
-  }, [refreshRentals, refetch]);
+  }, [refreshRentals, refetch, rowsPerPage]);
 
   useEffect(() => {
     let interval: number | undefined = undefined;
@@ -112,6 +114,11 @@ const RentalManagement = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setRowsPerPage(Number(event.target.value));
+    setPage(1);
   };
 
   const handleDownloadCsv = (csvData: string | null) => {
@@ -188,7 +195,22 @@ const RentalManagement = () => {
           >
             Previous
           </button>
-          <span className="mx-4">Page {page}</span>
+          <div className="flex justify-center items-center space-x-4">
+            <div className="flex items-center">
+              <span className="mr-2">Rows per page:</span>
+              <select
+                value={rowsPerPage}
+                onChange={handleRowsPerPageChange}
+                className="px-2 py-1 border rounded border-red-600 focus:border-red-600 focus:outline-none"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+              <span>{page} - {rowsPerPage} of {filteredRentals?.count || 0}</span>
+          </div>
           <button
             onClick={() => handlePageChange(page + 1)}
             disabled={!filteredRentals?.next || isFetchingProgress || pageLoading}
