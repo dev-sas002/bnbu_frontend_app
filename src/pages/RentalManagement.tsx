@@ -209,7 +209,11 @@ const RentalManagement = () => {
                 <option value={100}>100</option>
               </select>
             </div>
-              <span>{page} - {rowsPerPage} of {filteredRentals?.count || 0}</span>
+            <span>
+              {(page - 1) * rowsPerPage + 1} -{' '}
+              {Math.min(page * rowsPerPage, filteredRentals?.count || 0)} of{' '}
+              {filteredRentals?.count || 0}
+            </span>
           </div>
           <button
             onClick={() => handlePageChange(page + 1)}
