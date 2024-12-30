@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { RentalPropertyStatus } from '../types/rentalTypes';
+import { useFilteredListQuery } from '../services/api'; // Assuming this hook fetches the data
 
 interface RentalSearchBarProps {
   onSearch: (filters: RentalSearchFilters) => void;
@@ -24,6 +25,16 @@ const RentalSearchBar: React.FC<RentalSearchBarProps> = ({ onSearch }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [allBatchIds, setAllBatchIds] = useState<number[]>([]); // State for all batch ids
+
+  const { data } = useFilteredListQuery({});
+  console.log(data);
+
+  useEffect(() => {
+    if (data?.results?.all_batch_ids) {
+      setAllBatchIds(data?.results?.all_batch_ids);
+    }
+  }, [data]);
 
   // Helper function to format dates as "Month Day, Year"
   const formatDate = (date: string | Date): string => {
@@ -84,14 +95,26 @@ const RentalSearchBar: React.FC<RentalSearchBarProps> = ({ onSearch }) => {
           className="p-2 border rounded-lg bg-gray-50 w-full md:w-[calc(50%-8px)] lg:w-auto"
         />
 
-        {/* Batch ID */}
-        <input
-          type="number"
-          value={batchId}
-          onChange={(e) => setBatchId(e.target.value ? parseInt(e.target.value) : '')}
-          placeholder="Batch ID"
-          className="p-2 border rounded-lg bg-gray-50 w-full md:w-[calc(50%-8px)] lg:w-auto"
-        />
+        {/* Batch ID Dropdown */}
+        <div className="relative w-full md:w-[calc(50%-8px)] lg:w-auto">
+          <select
+            value={batchId}
+            onChange={(e) => setBatchId(e.target.value ? parseInt(e.target.value) : '')}
+            className="p-2 border rounded-lg bg-gray-50 w-full appearance-none pr-8"
+          >
+            <option value="">Select Batch ID</option>
+            {allBatchIds.map((id) => (
+              <option key={id} value={id}>
+                Batch ID {id}
+              </option>
+            ))}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
 
         {/* Status Dropdown */}
         <div className="relative w-full md:w-[calc(50%-8px)] lg:w-auto">

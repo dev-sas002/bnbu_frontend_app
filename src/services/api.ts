@@ -348,7 +348,7 @@ export const api = createApi({
     // Filtered list of rental properties with pagination
     filteredList: builder.query({
       query: (filters) => {
-        const { min_profit, max_profit, status, batch_id, start_date, end_date, page = 1, pageSize = 10 } = filters || {};
+        const { min_profit, max_profit, status, batch_id, start_date, end_date, page = 1, pageSize = 10, all_batch_ids } = filters || {};
 
         // Create the payload for the request body
         const body: Record<string, string> = {
@@ -360,6 +360,7 @@ export const api = createApi({
           end_date,
           page,
           page_size: pageSize,
+          all_batch_ids,
         };
 
         // Filter out undefined values from the body

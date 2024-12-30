@@ -52,13 +52,27 @@ const RentalManagement = () => {
 
   const dispatch = useDispatch();
 
+  const [allBatchIds, setAllBatchIds] = useState<number[]>([]); // State for all batch ids
+
+  const { data: batchIdData, refetch: refetchBatchIds } = useFilteredListQuery({}); // Assuming this query fetches all batch ids
+
+  useEffect(() => {
+    if (batchIdData?.results?.all_batch_ids) {
+      setAllBatchIds(batchIdData.results.all_batch_ids);
+    }
+  }, [batchIdData]);
+
+  useEffect(() => {
+    refetchBatchIds(); 
+  }, [refreshRentals, refetchBatchIds]);
+
   useEffect(() => {
     refetch();
   }, [refreshRentals, refetch, rowsPerPage]);
 
   useEffect(() => {
     let interval: number | undefined = undefined;
-    
+
     if (polling && taskId) {
       interval = setInterval(async () => {
         const result = await refetchTaskResult();
@@ -99,13 +113,27 @@ const RentalManagement = () => {
         dispatch(setTask(response.task_id));
         dispatch(setPolling(true)); // Start polling
       }
+      // After successful upload, update the batch_id in the search filters
+      if (response.batch_id) {
+        setSearchFilters((prevFilters) => {
+          const newFilters = { ...prevFilters, batch_id: response.batch_id };
+          return newFilters;
+        });
+      }
+      // Refetch batch ids after upload
+      refetchBatchIds();
     } catch (error) {
       console.error('Failed to upload properties:', error);
       toast.error('Failed to upload properties.');
       dispatch(setLoading(false)); // Stop loading on error
     }
   };
-  
+
+  useEffect(() => {
+    if (searchFilters.batch_id) {
+      refetch();
+    }
+  }, [searchFilters.batch_id, refetch]);
 
   const handleSearch = (filters: any) => {
     setSearchFilters(filters);
@@ -185,7 +213,7 @@ const RentalManagement = () => {
           </div>
         </div>
         <RentalSearchBar onSearch={handleSearch} />
-        <RentalTable rentals={filteredRentals?.results || []} />
+        <RentalTable rentals={filteredRentals?.results?.properties || []} />
         {/* Pagination Controls */}
         <div className="flex justify-between items-center mt-4">
           <button
