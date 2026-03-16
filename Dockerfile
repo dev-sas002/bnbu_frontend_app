@@ -5,7 +5,7 @@
 # and the demo flag are build args rather than runtime environment variables —
 # a built bundle is pinned to whatever it was built with.
 # ---------------------------------------------------------------------------
-FROM node:20-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
 
