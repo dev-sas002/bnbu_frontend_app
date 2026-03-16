@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { usePreviewDocumentQuery } from '@/services/api';
 import { Button, Card, ErrorState, PageHeader, Spinner } from '@/ui';
 

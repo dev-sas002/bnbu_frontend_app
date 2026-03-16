@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import bnbLogo from '@/assets/images/bnb_logo.webp';
 import { cn } from '@/ui';
 import { AnalyzerIcon, CloseIcon, DashboardIcon, LeaseIcon, RegulationIcon } from '@/ui/icons';

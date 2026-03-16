@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { useCreateRegulationMutation } from '@/services/api';
 import { isAwaitingAnswer } from '@/types/regulationTypes';

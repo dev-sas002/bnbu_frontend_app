@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import bnbLogo from '@/assets/images/bnb_logo.webp';
 import ForgotPasswordDialog from '@/components/ForgotPasswordDialog';
 import { isDemoMode } from '@/demo/demoBaseQuery';

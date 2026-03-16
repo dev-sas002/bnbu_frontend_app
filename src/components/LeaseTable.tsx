@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { formatDate } from '@/lib/format';
 import type { Lease } from '@/types/leaseTypes';
 import { Button, Column, DataTable, LEASE_STATUSES, StatusBadge } from '@/ui';

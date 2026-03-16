@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import bnbLogo from '@/assets/images/bnb_logo.webp';
 import { useUpdatePasswordMutation } from '@/services/api';

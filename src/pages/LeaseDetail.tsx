@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import UploadRevisionLeaseModal from '@/components/UploadRevisionLeaseModal';
 import { formatAddress, formatDate } from '@/lib/format';

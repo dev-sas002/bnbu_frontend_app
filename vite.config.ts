@@ -45,8 +45,8 @@ export default defineConfig({
                 'react-dom',
                 'scheduler',
                 'react-router',
-                'react-router-dom',
-                '@remix-run',
+                'cookie',
+                'set-cookie-parser',
                 'react-toastify',
                 'clsx'
               ),

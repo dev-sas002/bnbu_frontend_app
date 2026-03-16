@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import RegulationSearchBar, { RegulationSearchFilters } from '@/components/RegulationSearchBar';
 import RegulationTable from '@/components/RegulationTable';
 import useDocumentVisible from '@/hooks/useDocumentVisible';

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { formatDate, plainTextPreview } from '@/lib/format';
 import { isAwaitingAnswer, type Regulation } from '@/types/regulationTypes';
 import { Column, DataTable, REGULATION_STATUSES, StatusBadge } from '@/ui';
