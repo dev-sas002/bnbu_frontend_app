@@ -3,6 +3,7 @@ import { buildQuery } from '../queryString';
 import type { Page } from '@/types/api';
 import type {
   Lease,
+  LeaseAddressUpdate,
   LeaseSearchParams,
   ReviseLeaseResponse,
   UploadLeaseResponse,
@@ -67,7 +68,7 @@ export const leasesApi = baseApi.injectEndpoints({
       ],
     }),
 
-    updateLease: builder.mutation<Lease, Lease>({
+    updateLease: builder.mutation<Lease, LeaseAddressUpdate>({
       query: ({ id, ...leaseData }) => ({
         url: `api/leases/${id}/update/`,
         method: 'PUT',

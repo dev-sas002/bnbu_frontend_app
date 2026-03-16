@@ -10,7 +10,7 @@ import {
   useUpdateLeaseMutation,
   useUploadLeaseMutation,
 } from '@/services/api';
-import type { Document, Lease } from '@/types/leaseTypes';
+import type { Document, Lease, LeaseAddressUpdate } from '@/types/leaseTypes';
 import { Button, PageHeader, Pagination } from '@/ui';
 import { UploadIcon } from '@/ui/icons';
 
@@ -63,7 +63,7 @@ const LeaseManagement: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (lease: Lease) => {
+  const handleUpdate = async (lease: LeaseAddressUpdate) => {
     try {
       await updateLease(lease).unwrap();
       setEditing(null);

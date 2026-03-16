@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import type { Lease } from '@/types/leaseTypes';
+import type { Lease, LeaseAddressUpdate } from '@/types/leaseTypes';
 import { Button, Field, Input, Modal } from '@/ui';
 import Dropzone from '@/ui/Dropzone';
 
@@ -8,7 +8,7 @@ interface UploadLeaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpload?: (leaseData: FormData) => void | Promise<void>;
-  onUpdate?: (leaseData: Lease) => void | Promise<void>;
+  onUpdate?: (leaseData: LeaseAddressUpdate) => void | Promise<void>;
   leaseData?: Lease | null;
   isEditMode?: boolean;
   submitting?: boolean;
@@ -74,7 +74,7 @@ const UploadLeaseModal: React.FC<UploadLeaseModalProps> = ({
     try {
       if (isEditMode && leaseData) {
         await onUpdate?.({
-          ...leaseData,
+          id: leaseData.id,
           address1: fields.address1,
           address2: fields.address2,
           city: fields.city,

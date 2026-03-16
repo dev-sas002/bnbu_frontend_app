@@ -244,3 +244,34 @@ describe('document endpoints', () => {
     expect(result.error).toMatchObject({ status: 403 })
   })
 })
+
+describe('fields the API owns', () => {
+  it('updateLease sends only the address, never the review-driven status', async () => {
+    const store = makeStore()
+
+    await store.dispatch(
+      api.endpoints.updateLease.initiate({
+        id: 41,
+        address1: '9 Elm St',
+        address2: '',
+        city: 'Austin',
+        state: 'TX',
+        zip_code: '78701',
+      })
+    )
+
+    const request = lastRequest()
+    expect(request.method).toBe('PUT')
+    expect(request.url).toMatch(/api\/leases\/41\/update\/$/)
+    const body = await request.json()
+    expect(body).toEqual({
+      address1: '9 Elm St',
+      address2: '',
+      city: 'Austin',
+      state: 'TX',
+      zip_code: '78701',
+    })
+    expect(body).not.toHaveProperty('status')
+    expect(body).not.toHaveProperty('documents')
+  })
+})

@@ -33,6 +33,16 @@ export interface Lease {
   documents?: Document[];
 }
 
+/**
+ * What the edit dialog may change. `status` is set by the document review and
+ * the nested documents carry their own review status, so neither is sent:
+ * echoing a stale copy back could undo a review that finished meanwhile.
+ */
+export type LeaseAddressUpdate = Pick<
+  Lease,
+  'id' | 'address1' | 'address2' | 'city' | 'state' | 'zip_code'
+>;
+
 export interface LeaseSearchParams {
   page?: number;
   address?: string;
