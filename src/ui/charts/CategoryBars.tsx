@@ -57,7 +57,7 @@ const CategoryBars: React.FC<CategoryBarsProps> = ({
         <YAxis type="category" dataKey="name" {...AXIS_PROPS} width={96} />
         <Tooltip
           {...TOOLTIP_PROPS}
-          formatter={(value: number) => [`${value} ${value === 1 ? 'user' : 'users'}`, '']}
+          formatter={(value) => [`${value} ${Number(value) === 1 ? 'user' : 'users'}`, '']}
         />
         <Bar
           dataKey="value"

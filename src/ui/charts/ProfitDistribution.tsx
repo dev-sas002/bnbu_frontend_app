@@ -44,7 +44,7 @@ const ProfitDistribution: React.FC<ProfitDistributionProps> = ({
         <YAxis {...AXIS_PROPS} allowDecimals={false} width={44} />
         <Tooltip
           {...TOOLTIP_PROPS}
-          formatter={(value: number) => [`${value} ${value === 1 ? 'property' : 'properties'}`, '']}
+          formatter={(value) => [`${value} ${Number(value) === 1 ? 'property' : 'properties'}`, '']}
         />
         <Bar dataKey="count" radius={[4, 4, 0, 0]} isAnimationActive={false}>
           {buckets.map((bucket) => (
