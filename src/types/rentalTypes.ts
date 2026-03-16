@@ -6,8 +6,11 @@ export enum RentalPropertyStatus {
   Error = 'Error',
 }
 
-/** Spreadsheet formats the upload endpoint accepts. */
-export const VALID_FILE_EXTENSIONS: string[] = ['.xls', '.xlsx', '.csv'];
+/**
+ * Spreadsheet formats the upload endpoint accepts. Legacy `.xls` is refused by
+ * the API (it has no engine to read it), so it is not offered here either.
+ */
+export const VALID_FILE_EXTENSIONS: string[] = ['.xlsx', '.csv'];
 
 /** Columns the backend requires in an uploaded spreadsheet. */
 export const REQUIRED_COLUMNS: string[] = ['Location', 'Price', 'Sq. ft.', 'Ba', 'Br', 'Link'];

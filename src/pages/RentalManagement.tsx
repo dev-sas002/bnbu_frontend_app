@@ -106,9 +106,11 @@ const RentalManagement: React.FC = () => {
         setFilters((current) => ({ ...current, batch_id: response.batch_id }));
         setPage(1);
       }
-    } catch {
+    } catch (failure) {
       dispatch(taskSettled());
-      toast.error('Failed to upload the spreadsheet.');
+      // A 400 names the problem (wrong format, missing columns); say it.
+      const message = (failure as { data?: { message?: unknown } }).data?.message;
+      toast.error(typeof message === 'string' && message ? message : 'Failed to upload the spreadsheet.');
     }
   };
 

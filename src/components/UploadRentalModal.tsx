@@ -54,12 +54,11 @@ const UploadRentalModal: React.FC<UploadRentalModalProps> = ({
           files={files}
           onFilesChange={setFiles}
           accept={{
-            'application/vnd.ms-excel': ['.xls'],
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
             'text/csv': ['.csv'],
           }}
           maxFiles={1}
-          hint={`${VALID_FILE_EXTENSIONS.join(', ')} — one file at a time`}
+          hint={`${VALID_FILE_EXTENSIONS.join(' or ')}, one file at a time. Save .xls workbooks as .xlsx first.`}
           disabled={submitting}
         />
 

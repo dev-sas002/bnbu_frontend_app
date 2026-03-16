@@ -1,5 +1,5 @@
-import React from 'react';
-import { useDropzone, type Accept } from 'react-dropzone';
+import React, { useState } from 'react';
+import { useDropzone, type Accept, type FileRejection } from 'react-dropzone';
 import { cn } from './cn';
 import { CloseIcon, UploadIcon } from './icons';
 
@@ -13,6 +13,14 @@ export interface DropzoneProps {
   disabled?: boolean;
   id?: string;
 }
+
+const describeRejection = ([first]: FileRejection[], accept: Accept): string => {
+  if (first.errors.some((error) => error.code === 'file-invalid-type')) {
+    const extensions = Object.values(accept).flat().join(', ');
+    return `${first.file.name} was not added: only ${extensions} files are accepted.`;
+  }
+  return `${first.file.name} was not added: ${first.errors[0]?.message ?? 'it was rejected'}.`;
+};
 
 const formatSize = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -36,11 +44,17 @@ const Dropzone: React.FC<DropzoneProps> = ({
   disabled = false,
   id,
 }) => {
+  // A refused file used to vanish without a word, which reads as a broken
+  // picker rather than a wrong format.
+  const [rejection, setRejection] = useState<string | null>(null);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
     maxFiles,
     disabled,
-    onDrop: (accepted) => {
+    onDropRejected: (rejections) => setRejection(describeRejection(rejections, accept)),
+    onDrop: (accepted, rejections) => {
+      if (rejections.length === 0) setRejection(null);
       if (accepted.length === 0) return;
       onFilesChange(maxFiles === 1 ? accepted.slice(0, 1) : [...files, ...accepted]);
     },
@@ -67,6 +81,12 @@ const Dropzone: React.FC<DropzoneProps> = ({
         </p>
         {hint && <p className="mt-1 text-xs text-ink-subtle">{hint}</p>}
       </div>
+
+      {rejection && (
+        <p role="alert" className="text-sm text-negative-fg">
+          {rejection}
+        </p>
+      )}
 
       {files.length > 0 && (
         <ul className="space-y-1.5">
