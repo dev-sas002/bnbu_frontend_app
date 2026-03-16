@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Caches
+.cache/
+.vite/
+.eslintcache
+.npm/
+
+# Tests and screenshots tooling
+coverage/
+playwright-report/
+test-results/
+
+# Logs and scratch
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+tmp/
+temp/
+
+# Environment files. Vite reads .env.development / .env.staging /
+# .env.production; only the example is tracked.
+.env
+.env.*
+!.env.example
+
+# A host Python virtualenv left in this folder by an earlier tool.
+project_venv/
+
+# Repository automation is not part of this project.
+.github/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.local
