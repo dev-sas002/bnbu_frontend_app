@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bnbLogo from '@/assets/images/bnb_logo.webp';
 import { isDemoMode } from '@/demo/demoBaseQuery';
-import { useLoginMutation } from '@/services/api';
+import { useLazyGetUserProfileQuery, useLoginMutation } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { acknowledgeSessionExpiry, setSession } from '@/store/slices/authSlice';
 import { Button, Field, Input } from '@/ui';
@@ -47,6 +47,7 @@ const Login: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
+  const [loadProfile, { isFetching: isLoadingProfile }] = useLazyGetUserProfileQuery();
   const wasSessionExpired = useAppSelector((state) => state.auth.sessionExpired);
 
   useEffect(() => {
@@ -101,12 +102,24 @@ const Login: React.FC = () => {
         localStorage.removeItem('email');
       }
 
-      const returnTo = (location.state as { from?: string } | null)?.from;
-      navigate(returnTo && returnTo !== '/' ? returnTo : '/dashboard');
     } catch {
       setEmailError('Failed to log in');
       setPasswordError('Please check your credentials and try again');
+      return;
     }
+
+    // The token pair carries no user, so the profile says whether this is an
+    // invited account that still has to choose its own password. Admins are
+    // exempt on the API side too. If the profile cannot be read, the
+    // dashboard's own loading and error states take over.
+    const profile = await loadProfile().unwrap().catch(() => undefined);
+    if (profile?.is_first_login && profile.user_type !== 'admin') {
+      navigate(`/update-password/${profile.id}`, { replace: true });
+      return;
+    }
+
+    const returnTo = (location.state as { from?: string } | null)?.from;
+    navigate(returnTo && returnTo !== '/' ? returnTo : '/dashboard');
   };
 
   return (
@@ -186,7 +199,7 @@ const Login: React.FC = () => {
               </span>
             </div>
 
-            <Button type="submit" className="w-full" loading={isLoading}>
+            <Button type="submit" className="w-full" loading={isLoading || isLoadingProfile}>
               Sign in
             </Button>
           </form>

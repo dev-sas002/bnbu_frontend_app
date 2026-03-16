@@ -27,6 +27,7 @@ const renderLogin = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<div>Dashboard page</div>} />
+          <Route path="/update-password/:id" element={<div>Set password page</div>} />
         </Routes>
       </MemoryRouter>
     </Provider>
@@ -94,6 +95,27 @@ describe('Login submission', () => {
 
     expect(store.getState().auth.token).toBe('jwt-token')
     expect(localStorage.getItem('token')).toBe('jwt-token')
+  })
+
+  it('sends an invited account to choose its password before the dashboard', async () => {
+    fetchMock.mockImplementation(async (request: Request) =>
+      new Response(
+        JSON.stringify(
+          request.url.endsWith('account/profile/')
+            ? { id: 12, email: 'new@example.com', user_type: 'customer', is_first_login: true }
+            : { access: 'jwt-token', refresh: 'r' }
+        ),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    )
+    renderLogin()
+    fillIn(/^email/i, 'new@example.com')
+    fillIn(/^password/i, 'from-the-reset-mail')
+    submit()
+
+    await waitFor(() => {
+      expect(screen.getByText('Set password page')).toBeInTheDocument()
+    })
   })
 
   it('shows an error and stays put when the API rejects the credentials', async () => {

@@ -49,7 +49,14 @@ const App: React.FC = () => (
   <Suspense fallback={<RouteFallback />}>
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/update-password/:id" element={<UpdatePassword />} />
+      <Route
+        path="/update-password/:id"
+        element={
+          <PrivateRoute>
+            <UpdatePassword />
+          </PrivateRoute>
+        }
+      />
 
       <Route element={<ProtectedShell />}>
         <Route path="/dashboard" element={<Dashboard />} />

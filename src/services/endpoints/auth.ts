@@ -29,17 +29,21 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ['Profile'],
     }),
 
-    /** First-login password set, addressed by user id and not authenticated. */
+    /**
+     * First-login password set. The API reads `new_password` and
+     * `confirm_password`, runs Django's validators, and only honours POST from
+     * the account itself, so this needs the session the user just opened.
+     */
     updatePassword: builder.mutation<
       { message?: string },
-      { id: string | number | undefined; passwordData: { password: string } }
+      { id: string | number | undefined; newPassword: string; confirmPassword: string }
     >({
-      query: ({ id, passwordData }) => ({
+      query: ({ id, newPassword, confirmPassword }) => ({
         url: `account/users/update-password/${id}/`,
-        method: 'PUT',
-        body: passwordData,
+        method: 'POST',
+        body: { new_password: newPassword, confirm_password: confirmPassword },
       }),
-      invalidatesTags: (_result, _error, { id }) => [{ type: 'User', id }],
+      invalidatesTags: (_result, _error, { id }) => [{ type: 'User', id }, 'Profile'],
     }),
 
     changePassword: builder.mutation<
@@ -67,6 +71,7 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useGetUserProfileQuery,
+  useLazyGetUserProfileQuery,
   useGetDashboardQuery,
   useUpdatePasswordMutation,
   useChangePasswordMutation,

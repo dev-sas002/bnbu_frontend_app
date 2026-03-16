@@ -7,9 +7,21 @@ import { Button, Card, Field, Input } from '@/ui';
 
 const MIN_LENGTH = 8;
 
+/** The DRF error body for this route: field errors, or `{error}` on a 403. */
+const describeFailure = (error: unknown): string => {
+  const data = (error as { data?: Record<string, unknown> } | undefined)?.data;
+  const first = (value: unknown) => (Array.isArray(value) ? String(value[0]) : value);
+  const detail =
+    first(data?.new_password) ?? first(data?.non_field_errors) ?? data?.error ?? data?.detail;
+  return typeof detail === 'string' && detail
+    ? detail
+    : 'The password could not be set. Try again in a moment.';
+};
+
 /**
- * The first-login password set. Deliberately outside the auth guard: the user
- * gets here from an invitation link before they have a token.
+ * The first-login password set. Login sends a user here when their profile
+ * still has `is_first_login`; the API accepts it only from that signed-in
+ * account, so the route sits behind the auth guard.
  */
 const UpdatePassword: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,11 +46,11 @@ const UpdatePassword: React.FC = () => {
     setError(null);
 
     try {
-      await updatePassword({ id, passwordData: { password } }).unwrap();
-      toast.success('Password set. Sign in to continue.');
-      navigate('/');
-    } catch {
-      setError('The password could not be set. The invitation link may have expired.');
+      await updatePassword({ id, newPassword: password, confirmPassword: confirmation }).unwrap();
+      toast.success('Password set.');
+      navigate('/dashboard', { replace: true });
+    } catch (failure) {
+      setError(describeFailure(failure));
     }
   };
 
