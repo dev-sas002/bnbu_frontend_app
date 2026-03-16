@@ -9,7 +9,7 @@ import { Button } from '@/ui';
 const NotFound: React.FC = () => (
   <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
     <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">404</p>
-    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Page not found</h1>
+    <h1 className="mt-2 text-3xl font-semibold text-ink">Page not found</h1>
     <p className="mt-2 max-w-md text-sm text-ink-subtle">
       That address does not match anything in the console. It may have been renamed, or the link
       may be out of date.

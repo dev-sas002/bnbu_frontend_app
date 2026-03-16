@@ -13,6 +13,13 @@
     font-family: theme('fontFamily.sans');
   }
 
+  /* Page and dialog titles; everything below them stays in the UI face. */
+  h1,
+  h2 {
+    font-family: theme('fontFamily.display');
+    letter-spacing: -0.01em;
+  }
+
   /* One focus treatment for the whole product. Every interactive element
      inherits it, so keyboard users get a visible ring without each component
      having to remember one. :focus-visible keeps it off mouse clicks. */

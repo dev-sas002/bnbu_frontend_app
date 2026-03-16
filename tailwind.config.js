@@ -49,9 +49,14 @@ export default {
         info: { bg: '#eff6ff', fg: '#1d4ed8', line: '#bfdbfe' },
         neutral: { bg: '#f1f5f9', fg: '#475569', line: '#e2e8f0' },
       },
+      // IBM Plex Sans carries the UI: its figures are even-width, which the
+      // money and occupancy columns depend on. Page titles use Source Serif 4,
+      // the register of a lease or a city ordinance rather than of a SaaS
+      // dashboard.
       fontFamily: {
+        display: ['"Source Serif 4"', 'ui-serif', 'Georgia', 'Cambria', 'serif'],
         sans: [
-          'Inter',
+          '"IBM Plex Sans"',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',

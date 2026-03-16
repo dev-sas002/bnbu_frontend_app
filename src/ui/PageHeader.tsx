@@ -58,7 +58,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </ol>
         </nav>
       )}
-      <h1 className="truncate text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+      <h1 className="truncate text-2xl font-semibold text-ink">{title}</h1>
       {description && <p className="mt-1 max-w-2xl text-sm text-ink-subtle">{description}</p>}
     </div>
     {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}

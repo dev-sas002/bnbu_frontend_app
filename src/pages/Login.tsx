@@ -129,7 +129,7 @@ const Login: React.FC = () => {
       {/* Form column */}
       <div className="flex w-full flex-col justify-center px-6 py-12 sm:px-12 lg:w-[52%] lg:px-20">
         <div className="mx-auto w-full max-w-sm">
-          <h1 className="text-3xl font-semibold tracking-tight text-ink">Log in</h1>
+          <h1 className="text-3xl font-semibold text-ink">Log in</h1>
           <p className="mt-2 text-sm text-ink-subtle">
             Welcome back. Enter your details to open the console.
           </p>
@@ -232,7 +232,7 @@ const Login: React.FC = () => {
 
         <div className="relative max-w-md">
           <img src={bnbLogo} alt="bnb University" className="h-7 w-auto" />
-          <p className="mt-8 text-2xl font-semibold leading-snug text-white">
+          <p className="mt-8 font-display text-2xl font-semibold leading-snug text-white">
             Every lease, regulation and deal for your short-term rental portfolio, in one console.
           </p>
 

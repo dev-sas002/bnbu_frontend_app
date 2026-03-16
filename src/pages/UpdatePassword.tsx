@@ -60,7 +60,7 @@ const UpdatePassword: React.FC = () => {
         <img src={bnbLogo} alt="bnb University" className="mx-auto mb-8 h-6 w-auto" />
 
         <Card>
-          <h1 className="text-xl font-semibold tracking-tight text-ink">Set your password</h1>
+          <h1 className="text-xl font-semibold text-ink">Set your password</h1>
           <p className="mt-1 text-sm text-ink-subtle">
             Choose a password for your account. You will use it to sign in from now on.
           </p>
