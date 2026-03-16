@@ -3,6 +3,11 @@
  *
  * Everything visual in the app is assembled from these. Pages import from
  * `@/ui`; nothing outside this folder writes a colour, a radius or a shadow.
+ *
+ * `DateRangePicker` and `Dropzone` are imported by path, not from here. Each
+ * pulls in a form library (and the date picker its stylesheet, which is a side
+ * effect the bundler cannot drop), and the login screen imports this barrel,
+ * so listing them here put both libraries on the critical path.
  */
 export { cn } from './cn';
 export { default as Button } from './Button';
@@ -12,8 +17,6 @@ export { default as DataTable } from './DataTable';
 export type { Column, DataTableProps, SortDirection } from './DataTable';
 export { Field, Input, Select } from './Field';
 export { controlClassName, useFieldControlId } from './fieldContext';
-export { default as DateRangePicker } from './DateRangePicker';
-export { default as Dropzone } from './Dropzone';
 export { default as FilterBar } from './FilterBar';
 export { default as Modal } from './Modal';
 export { default as PageHeader } from './PageHeader';

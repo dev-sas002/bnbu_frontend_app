@@ -10,6 +10,8 @@ const statusSelect = () => screen.getByLabelText(/status/i)
 const search = () => fireEvent.click(screen.getByRole('button', { name: /^search$/i }))
 
 const openDatePicker = () => fireEvent.focus(dateInput())
+// react-datepicker 8+ renders the month as a grid, one gridcell per day.
+const calendarDays = () => screen.getAllByRole('gridcell')
 
 describe('LeaseSearchBar', () => {
   it('emits the typed address and selected status', () => {
@@ -45,7 +47,7 @@ describe('LeaseSearchBar', () => {
 
     openDatePicker()
     // Two clicks: react-datepicker's range mode takes a start then an end.
-    const days = screen.getAllByRole('option')
+    const days = calendarDays()
     const start = days[10]
     const end = days[14]
     fireEvent.click(start)
@@ -70,7 +72,7 @@ describe('LeaseSearchBar', () => {
     render(<LeaseSearchBar onSearch={onSearch} />)
 
     openDatePicker()
-    fireEvent.click(screen.getAllByRole('option')[8])
+    fireEvent.click(calendarDays()[8])
     search()
 
     const filters = onSearch.mock.calls[0][0]
