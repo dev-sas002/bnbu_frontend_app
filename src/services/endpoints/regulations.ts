@@ -39,6 +39,23 @@ export const regulationsApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Regulation', id: 'LIST' }],
     }),
 
+    /**
+     * Drops the cached answer and looks again, routed like a new search: 200
+     * with the answer when the curated table has one, otherwise 202 with
+     * `analysis_state: "pending"` and the previous answer still attached.
+     */
+    reanalyzeRegulation: builder.mutation<Regulation, number | string>({
+      query: (regulationId) => ({
+        url: `api/regulations/${regulationId}/reanalyze/`,
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, regulationId) => [
+        { type: 'Regulation', id: regulationId },
+        { type: 'Regulation', id: 'LIST' },
+        { type: 'RegulationChat', id: regulationId },
+      ],
+    }),
+
     chatWithRegulation: builder.mutation<
       ChatReply,
       { regulationId: string | number; message: string }
@@ -67,6 +84,7 @@ export const {
   useSearchRegulationsQuery,
   useGetRegulationByIdQuery,
   useCreateRegulationMutation,
+  useReanalyzeRegulationMutation,
   useChatWithRegulationMutation,
   useGetRegulationChatHistoryQuery,
 } = regulationsApi;

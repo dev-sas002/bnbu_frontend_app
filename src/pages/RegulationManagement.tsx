@@ -1,10 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegulationSearchBar, { RegulationSearchFilters } from '@/components/RegulationSearchBar';
 import RegulationTable from '@/components/RegulationTable';
+import useDocumentVisible from '@/hooks/useDocumentVisible';
 import { useGetRegulationsQuery, useSearchRegulationsQuery } from '@/services/api';
+import { isAwaitingAnswer } from '@/types/regulationTypes';
 import { Button, PageHeader, Pagination, StatTile } from '@/ui';
 import { SearchIcon } from '@/ui/icons';
+
+/** How often the list is re-read while a row on it is still being researched. */
+const POLL_MS = 10_000;
 
 const NO_FILTERS: RegulationSearchFilters = { query: '', status: '' };
 
@@ -17,12 +22,26 @@ const RegulationManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<RegulationSearchFilters>(NO_FILTERS);
 
+  const visible = useDocumentVisible();
+  // A new search or a re-analysis can come back 202 and be finished by a
+  // worker later, so the page keeps re-reading itself while any row on it is
+  // still owed an answer, and stops once none is.
+  const [awaiting, setAwaiting] = useState(false);
+  const pollingInterval = awaiting && visible ? POLL_MS : 0;
+
   const filtered = hasFilters(filters);
-  const listQuery = useGetRegulationsQuery(page, { skip: filtered });
-  const searchQuery = useSearchRegulationsQuery({ ...filters, page }, { skip: !filtered });
+  const listQuery = useGetRegulationsQuery(page, { skip: filtered, pollingInterval });
+  const searchQuery = useSearchRegulationsQuery(
+    { ...filters, page },
+    { skip: !filtered, pollingInterval }
+  );
   const active = filtered ? searchQuery : listQuery;
 
   const regulations = useMemo(() => active.data?.results ?? [], [active.data]);
+
+  useEffect(() => {
+    setAwaiting(regulations.some(isAwaitingAnswer));
+  }, [regulations]);
 
   const outcomes = useMemo(() => {
     const allowed = regulations.filter((row) => row.status === 'STR Allowed').length;

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ChatPanel from '@/features/chat/ChatPanel';
 import { mapChatHistory, type ChatMessage } from '@/features/chat/messages';
 import useDocumentVisible from '@/hooks/useDocumentVisible';
@@ -7,16 +7,13 @@ import {
   useChatWithRegulationMutation,
   useGetRegulationChatHistoryQuery,
 } from '@/services/api';
-import type { Regulation } from '@/types/regulationTypes';
+import { isAwaitingAnswer, type Regulation } from '@/types/regulationTypes';
 
 interface RegulationChatBoxProps {
   regulation: Regulation;
 }
 
 const ASSISTANT_NAME = 'RegAdvisor AI';
-
-/** Statuses that mean the backend is still working on an answer. */
-const IN_PROGRESS = new Set(['pending', 'Pending', 'STR Pending Approval']);
 
 /**
  * The regulation conversation. A thin adapter over `ChatPanel`, exactly like
@@ -27,10 +24,13 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [isTyping, setTyping] = useState(false);
 
-  // Research runs server-side after the question is created, so poll while the
-  // status says it is still going and stop as soon as it is not.
+  // Research runs server-side after the question is created or re-analysed,
+  // so poll while the row says a worker still owes it an answer. This keyed
+  // off `status` before, which also reads "pending" for an answer the
+  // classifier could not label, and "STR Pending Approval" is a finished
+  // answer: both polled for as long as the page stayed open.
   const visible = useDocumentVisible();
-  const isResearching = IN_PROGRESS.has(regulation.status);
+  const isResearching = isAwaitingAnswer(regulation);
 
   const { data, error, refetch } = useGetRegulationChatHistoryQuery(regulation.id, {
     skip: !regulation.id,
@@ -38,6 +38,14 @@ const RegulationChatBox: React.FC<RegulationChatBoxProps> = ({ regulation }) => 
   });
 
   const [chatWithRegulation, { isLoading: isSending }] = useChatWithRegulationMutation();
+
+  // The parent's poll is what notices the answer landing; fetch the history
+  // once more then, or the last tick before polling stopped could be stale.
+  const wasResearching = useRef(isResearching);
+  useEffect(() => {
+    if (wasResearching.current && !isResearching) refetch();
+    wasResearching.current = isResearching;
+  }, [isResearching, refetch]);
 
   const historyMessages = useMemo(() => mapChatHistory(data?.chat_history), [data?.chat_history]);
   const messages = useMemo(

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useCreateRegulationMutation } from '@/services/api';
+import { isAwaitingAnswer } from '@/types/regulationTypes';
 import { Button, Card, CardHeader, Field, Input, PageHeader } from '@/ui';
 import { SearchIcon, SparkIcon } from '@/ui/icons';
 
@@ -32,8 +33,13 @@ const RegulationDetail: React.FC = () => {
     setError(null);
 
     try {
-      await createRegulation({ search }).unwrap();
-      toast.success('Question submitted. RegAdvisor AI is researching it.');
+      const created = await createRegulation({ search }).unwrap();
+      // 201 carries a curated answer already; 202 is queued for a worker.
+      if (isAwaitingAnswer(created)) {
+        toast.success('Question submitted. RegAdvisor AI is researching it.');
+      } else {
+        toast.success('Answered from the curated rules table.');
+      }
       navigate('/regulations');
     } catch {
       setError('The question could not be submitted. Try again in a moment.');

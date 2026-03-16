@@ -17,6 +17,13 @@ export type RegulationStatus =
 export type GptResponse = GptAnalysis;
 export type { ChatTurn as ChatMessage };
 
+/**
+ * Where the lookup is, separate from what it concluded. A create or a
+ * re-analysis that needs the model comes back 202 with `pending`; a worker
+ * moves it to `running` and then `complete` or `failed`.
+ */
+export type AnalysisState = 'pending' | 'running' | 'complete' | 'failed';
+
 export interface Regulation {
   id: number;
   date: string;
@@ -24,7 +31,21 @@ export interface Regulation {
   status: RegulationStatus | string;
   gpt_response: GptAnalysis | null;
   chat_history: ChatTurn[];
+  analysis_state?: AnalysisState | string;
+  /** Which source answered: the curated table, the model, or empty. */
+  source?: string;
 }
+
+/**
+ * True while a worker still owes this row an answer. Rows from an API that
+ * predates `analysis_state` fall back to the lowercase `pending` status.
+ * `status` alone is not enough: the classifier also leaves `pending` on an
+ * answer it could not read, and that row will never change.
+ */
+export const isAwaitingAnswer = (regulation: Pick<Regulation, 'status' | 'analysis_state'>) =>
+  regulation.analysis_state
+    ? regulation.analysis_state === 'pending' || regulation.analysis_state === 'running'
+    : regulation.status === 'pending' || regulation.status === 'Pending';
 
 export interface RegulationCreate {
   search: string;

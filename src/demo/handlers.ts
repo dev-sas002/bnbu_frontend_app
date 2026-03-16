@@ -155,6 +155,13 @@ export const handleDemoRequest = (args: string | FetchArgs): DemoResult => {
       }
     );
   }
+  if (/^api\/regulations\/\d+\/reanalyze\//.test(url)) {
+    // The demo answers inline, like the API does when the curated table has
+    // the location (200 rather than 202).
+    const id = idFrom(url, /^api\/regulations\/(\d+)\//);
+    const regulation = DEMO_REGULATIONS.results.find((row) => row.id === id);
+    return regulation ? ok({ ...regulation, analysis_state: 'complete' }) : notFound(url);
+  }
   if (/^api\/regulations\/\d+\/chat\//.test(url)) {
     const message = String(body?.message ?? '');
     return ok({
@@ -176,6 +183,8 @@ export const handleDemoRequest = (args: string | FetchArgs): DemoResult => {
         status: 'pending',
         gpt_response: null,
         chat_history: [],
+        analysis_state: 'pending',
+        source: '',
       });
     }
     const page = numberParam(url, 'page', 1);

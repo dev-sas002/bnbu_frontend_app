@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDate, plainTextPreview } from '@/lib/format';
-import type { Regulation } from '@/types/regulationTypes';
+import { isAwaitingAnswer, type Regulation } from '@/types/regulationTypes';
 import { Column, DataTable, REGULATION_STATUSES, StatusBadge } from '@/ui';
 
 interface RegulationTableProps {
@@ -46,6 +46,12 @@ const RegulationTable: React.FC<RegulationTableProps> = ({
         secondary: true,
         render: (regulation) => {
           const message = regulation.gpt_response?.message;
+          if (isAwaitingAnswer(regulation) && !message) {
+            return <span className="text-ink-subtle">Researching…</span>;
+          }
+          if (regulation.analysis_state === 'failed' && !message) {
+            return <span className="text-negative-fg">Lookup failed. Open it to retry.</span>;
+          }
           if (!message) return <span className="text-ink-subtle">Not answered yet</span>;
           // One line of the analysis, so the table says something useful
           // without opening every row. The answer is markdown, so the syntax
