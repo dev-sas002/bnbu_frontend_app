@@ -36,4 +36,7 @@ export const TOOLTIP_PROPS = {
     color: '#0f172a',
   },
   labelStyle: { color: '#475569', fontWeight: 500 },
+  // The formatters return the whole line as the value and an empty name;
+  // Recharts 3 still prints the separator, which showed as ": 4 users".
+  separator: '',
 } as const;
