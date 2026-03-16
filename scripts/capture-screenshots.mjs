@@ -2,6 +2,7 @@
  * Capture the README screenshots.
  *
  *   docker compose up -d --build
+ *   npx playwright install chromium   # once
  *   npm run screenshots
  *   docker compose down -v
  *
@@ -16,7 +17,8 @@ import { chromium } from '@playwright/test';
 
 const BASE_URL = process.env.SCREENSHOT_BASE_URL ?? 'http://localhost:8140';
 const OUT_DIR = path.resolve('docs/screenshots');
-const VIEWPORT = { width: 1440, height: 900 };
+const DESKTOP = { width: 1440, height: 900 };
+const MOBILE = { width: 390, height: 844 };
 
 const shots = [
   {
@@ -63,6 +65,34 @@ const shots = [
       await page.waitForTimeout(300);
     },
   },
+  {
+    file: '05-regulation-answer.png',
+    path: '/regulation/17/chat',
+    settle: async (page) => {
+      await page.getByRole('heading', { name: 'Kirkland, WA' }).waitFor();
+      await page.getByRole('button', { name: 'Look again' }).waitFor();
+      await page.waitForTimeout(300);
+    },
+  },
+  {
+    file: '06-mobile-rental-analyzer.png',
+    path: '/rental-analyzer',
+    viewport: MOBILE,
+    settle: async (page) => {
+      await page.getByRole('heading', { name: 'Rental analyzer' }).waitFor();
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    file: '07-mobile-regulations.png',
+    path: '/regulations',
+    viewport: MOBILE,
+    settle: async (page) => {
+      await page.getByRole('heading', { name: 'Regulation searches' }).waitFor();
+      await page.getByText('Kirkland, WA').first().waitFor();
+      await page.waitForTimeout(300);
+    },
+  },
 ];
 
 const signIn = async (page) => {
@@ -71,25 +101,47 @@ const signIn = async (page) => {
   await page.waitForURL('**/dashboard');
 };
 
+const capture = async (page, file) => {
+  // Park the pointer, or a tap from signing in leaves a chart tooltip open.
+  await page.mouse.move(0, 0);
+  const target = path.join(OUT_DIR, file);
+  await page.screenshot({ path: target });
+  console.log(`wrote ${target}`);
+};
+
 const main = async () => {
   await mkdir(OUT_DIR, { recursive: true });
-
   const browser = await chromium.launch();
-  const context = await browser.newContext({
-    viewport: VIEWPORT,
-    deviceScaleFactor: 1,
-    reducedMotion: 'reduce',
-  });
-  const page = await context.newPage();
 
-  await signIn(page);
+  // One signed-in context per viewport; the demo session lives in its
+  // localStorage, so each signs in once.
+  const pages = new Map();
+  const pageFor = async (viewport) => {
+    const key = `${viewport.width}x${viewport.height}`;
+    if (!pages.has(key)) {
+      const context = await browser.newContext({
+        viewport,
+        deviceScaleFactor: 1,
+        reducedMotion: 'reduce',
+      });
+      const page = await context.newPage();
+      if (viewport === DESKTOP) {
+        // The login screen is the one shot taken before signing in.
+        await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+        await page.getByRole('heading', { name: 'Log in' }).waitFor();
+        await capture(page, '00-login.png');
+      }
+      await signIn(page);
+      pages.set(key, page);
+    }
+    return pages.get(key);
+  };
 
   for (const shot of shots) {
+    const page = await pageFor(shot.viewport ?? DESKTOP);
     await page.goto(`${BASE_URL}${shot.path}`, { waitUntil: 'networkidle' });
     await shot.settle(page);
-    const file = path.join(OUT_DIR, shot.file);
-    await page.screenshot({ path: file });
-    console.log(`wrote ${file}`);
+    await capture(page, shot.file);
   }
 
   await browser.close();

@@ -2,8 +2,8 @@
 
 A short-term-rental investor has three recurring questions: *does this lease let me list
 the unit nightly*, *does this city allow it at all*, and *does this listing actually make
-money*. BnBu Console is the browser client that answers them — React 18 + TypeScript on
-Vite, talking to the sibling Django service `bnbu_backend_api`.
+money*. BnBu Console is the browser client that answers them — React 19 + TypeScript on
+Vite 8, talking to the sibling Django service `bnbu_backend_api`.
 
 Every figure and every AI analysis comes from that API; nothing is computed in this repo
 except the Deal Brief's fallback arithmetic.
@@ -38,12 +38,13 @@ VITE_DEMO_MODE=false VITE_API_URL=http://host.docker.internal:8000/ \
 ```
 
 Vite inlines `VITE_*` values at build time, so those are **build args**: an image is pinned
-to whatever it was built with. The runtime stage is `nginx-unprivileged` as uid 101, with no
-build tooling in it and a fallback to `index.html` so a refresh on a route does not 404.
+to whatever it was built with. The build stage is `node:22-bookworm-slim` (matching `.nvmrc`
+and `engines`); the runtime stage is `nginx-unprivileged` as uid 101, with no build tooling
+in it and a fallback to `index.html` so a refresh on a route does not 404.
 
-Verified 2026-09-23: `docker compose config` parses, `docker compose build` succeeds, and
-`docker compose up -d` brought the container to `Up (healthy)` on `0.0.0.0:8140->8080` with
-`/` → 200, `/healthz` → 200 and the deep link `/rental-analyzer` → 200.
+Verified 2026-11-08 from a clean `git archive` of this repo: `docker compose build` succeeds,
+the container reaches `Up (healthy)` on `0.0.0.0:8140->8080`, and `/`, `/healthz`,
+`/rental-analyzer` and `/regulation/17/chat` all answer 200.
 
 ## What happens when you upload a lease
 
@@ -89,6 +90,11 @@ sequenceDiagram
 
 Kicking off the review is a second call, and a failure there leaves the lease uploaded but
 unanalysed — `LeaseManagement.tsx` says so at the call site rather than pretending otherwise.
+
+Review outcomes belong to the API. Editing a lease sends its five address fields and
+nothing else: the edit dialog used to spread the whole cached lease into the `PUT`,
+`status` included, so a dialog opened before a review finished could write the old status
+back over the new one.
 
 ![A lease review: the initial analysis beside a follow-up conversation](docs/screenshots/02-lease-review.png)
 
@@ -137,12 +143,42 @@ The fetching is RTK Query's `pollingInterval` rather than a timer per component,
 views of the same document share one poll. `DocumentChat` is a separate cache tag from
 `Document` precisely so a poll tick does not drag the lease's document list along with it.
 
-## Regulation searches, and two small honesties
+## Regulation searches
 
 ![Saved regulation searches with outcome badges and answer previews](docs/screenshots/03-regulations.png)
 
-Ask whether a city permits short-term rentals, keep the answer, filter the pile later. Two
-things in that table are worth pointing at:
+Ask whether a city permits short-term rentals, keep the answer, filter the pile later.
+
+A search is answered one of two ways. If the API's curated rules table knows the place,
+`POST api/regulations/` comes back `201` with the answer attached. Otherwise it comes back
+`202` with `analysis_state: "pending"`, and a worker fills the row in later.
+`POST api/regulations/:id/reanalyze/` — the **Look again** button on a search's page — is
+routed the same way, and keeps the previous answer on the row until the new one lands.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> pending : 202 from create or reanalyze
+    [*] --> complete : 200 / 201, curated answer
+    pending --> running : worker picks it up
+    running --> complete
+    running --> failed
+    failed --> pending : Look again
+    complete --> pending : Look again
+```
+
+The console follows `analysis_state`, not the outcome column. While any row on the list,
+or the one search being viewed, is `pending` or `running`, a second subscription to the same
+RTK Query cache entry polls it (every 10 s on the list, 8 s on the search page, paused in a
+hidden tab). The cache entry is shared, so the visible data refreshes, and the subscription
+drops away as soon as nothing is owed. That replaced a poll keyed on `status === "pending"`,
+which ran for as long as the page stayed open on a row the classifier could not label —
+the API leaves those `pending` for good — and on every `STR Pending Approval` answer, which
+is finished.
+
+![A saved search with the Look again action](docs/screenshots/05-regulation-answer.png)
+
+Two smaller things in that table are worth pointing at:
 
 - The Savannah row reads **Researching**, not a grey `pending`. The Django model defaults to
   a lowercase `pending` — a different shape from the title-cased `STR Allowed` /
@@ -155,6 +191,37 @@ things in that table are worth pointing at:
   `**SHORT-TERM RENTALS ALLOWED WITH RESTRICTIONS**`. The stored answers are markdown, and
   `plainTextPreview()` in `lib/format.ts` strips the syntax for one-line previews — rendering
   markdown properly in a table cell would pull a 118 kB renderer onto a list route.
+
+## Accounts
+
+![The login screen, with the reset link beside Remember me](docs/screenshots/00-login.png)
+
+**Forgot your password?** on the login screen opens a dialog that posts the address to
+`account/password/reset/`. The API answers `200` whether or not the address has an
+account, so the dialog says the same thing either way — *if an account exists for that
+address, a reset link is on its way* — and only a malformed address (`400`) reads
+differently.
+
+Accounts created by an admin start with `is_first_login` set. After signing in, the console
+reads the profile, and such an account (admins excepted, as on the API side) is sent to
+`/update-password/:id` before the dashboard. That page posts `new_password` and
+`confirm_password` and shows Django's validator message when one fails ("This password is
+too common."). It used to `PUT {password}`, a body the API never accepted.
+
+"Remember me" stores the email address and nothing else. `Login.tsx` also calls
+`localStorage.removeItem('password')` on mount, unconditionally — an older build of this
+app wrote the user's plaintext password there, and this clears it out of existing browsers
+on the next visit rather than leaving it readable by any script on the origin. Two tests in
+`pages/__tests__/Login.test.tsx` pin the behaviour: *"never writes the password to
+localStorage"* and *"prefills the remembered email and clears any legacy stored password"*.
+
+## Uploads
+
+The rental analyzer takes `.xlsx` and `.csv`. Legacy `.xls` is refused by the API, which
+has no engine to read it, so the picker no longer offers it and says to re-save the
+workbook as `.xlsx`. A file the picker refuses gets a line saying why instead of vanishing,
+and when the API rejects an upload with a `400` (missing columns, say), its own message is
+what the toast shows. Leases take PDFs only.
 
 ## One typed data layer
 
@@ -182,48 +249,41 @@ one answering from `src/demo/fixtures.ts`; the endpoints, the tags and every com
 them are identical either way, which is what makes the screenshots here reproducible with no
 backend. The fixtures sit behind a dynamic `import()`, so an ordinary build never fetches them.
 
-## The bundle was the bottleneck
+## What ships
 
-The backend was never the slow part; the first load was. What ships today:
+Measured from `npm run build` on 2026-11-08:
 
 | Chunk | Raw | Gzip | When it loads |
 | --- | --- | --- | --- |
-| `index` (app shell + Login) | 114.1 kB | 37.9 kB | always |
-| `vendor-react` | 165.0 kB | 53.7 kB | always |
-| `vendor-redux` | 42.9 kB | 14.6 kB | always |
-| `vendor-charts` (Recharts) | 369.5 kB | 101.9 kB | the two charting routes |
-| `vendor-forms` (formik, yup, datepicker, dropzone) | 298.4 kB | 82.1 kB | routes with forms |
-| `vendor-markdown` | 117.4 kB | 36.1 kB | routes that render an analysis |
+| `index` (app shell + Login) | 61.5 kB | 19.3 kB | always |
+| `vendor-react` (React 19, React Router 7, toasts) | 292.0 kB | 91.0 kB | always |
+| `vendor-redux` | 86.2 kB | 29.3 kB | always |
+| `vendor-charts` (Recharts 3) | 338.4 kB | 94.4 kB | the two charting routes |
+| `vendor-forms` (formik, yup, datepicker, dropzone) | 268.2 kB | 74.3 kB | routes with forms |
+| `vendor-markdown` | 117.8 kB | 35.5 kB | routes that render an analysis |
 
-That is **322 kB raw / 106 kB gzip** on the critical path — the three rows nginx serves
-before anything is clicked, which you can confirm from the `<script>` and `modulepreload`
-tags in `dist/index.html` after `npm run build`. The whole `dist/` is 1,328 kB, images
-included. Every signed-in page is `lazy()`; `Login` is the deliberate exception, being the
-entry point for every unauthenticated visit.
+The critical path — the chunks `dist/index.html` loads or `modulepreload`s before anything
+is clicked — is **441 kB raw / 140 kB gzip**. That is up from 322 kB / 106 kB under React 18,
+and nearly all of the difference is `react-dom` 19; React Router 7 adds 15 kB, and Recharts 3
+moved some shared Redux Toolkit code into `vendor-redux`. Every signed-in page is `lazy()`;
+`Login` is the deliberate exception, being the entry point for every unauthenticated visit.
+The whole `dist/` is 1.4 MB, images included.
 
-The one non-obvious part is in `vite.config.ts`, and it is reproducible in one line. The
-`vendor-react` manual chunk lists `'react/jsx-runtime'` explicitly, because it is a
-separate entry point from `'react'`. Delete that one string and rebuild: Rollup lets
-`vendor-markdown` absorb it, the entry chunk imports `jsx` from there, and `dist/index.html`
-grows a third `modulepreload` — the 118 kB markdown renderer, on the critical path of every
-route, including routes with no markdown on them: 322 kB becomes 440 kB for a chunking
-accident. Nothing in the build complains: the critical path grows, but no single chunk
-crosses the 400 kB `chunkSizeWarningLimit`. That is why the reason for that one string is
-written out in `vite.config.ts` rather than left to be rediscovered.
-
-## Remember me remembers an email
-
-"Remember me" stores the email address and nothing else. `Login.tsx` also calls
-`localStorage.removeItem('password')` on mount, unconditionally — an older build of this
-app wrote the user's plaintext password there, and this clears it out of existing browsers
-on the next visit rather than leaving it readable by any script on the origin. Two tests in
-`pages/__tests__/Login.test.tsx` pin the behaviour: *"never writes the password to
-localStorage"* and *"prefills the remembered email and clears any legacy stored password"*.
+The vendor split lives in `vite.config.ts` as Rolldown `codeSplitting` groups, and two
+details there are load-bearing. Rolldown captures a group's dependencies along with it, so a
+small shared package can drag a whole lazy group onto the critical path: `clsx` and
+`react-toastify` (used by the shell) are claimed by `vendor-react`, and `lodash` (shared by
+formik and Recharts) by the forms group, which outranks charts. And `ui/index.ts` does not
+re-export `DateRangePicker` or `Dropzone`: the login screen imports that barrel, and the date
+picker's stylesheet import is a side effect the bundler cannot drop, so listing them there
+put both form libraries in the entry chunk. Nothing in the build complains when either goes
+wrong — the critical path just grows — which is why both are explained where they live.
 
 ## Build-time configuration
 
 Declared in `src/vite-env.d.ts`, which is the file to read if this table and the code ever
-disagree.
+disagree. `.env.example` lists all of them; copy it to `.env.development` for `npm run dev`
+or `.env.production` for a build.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
@@ -245,27 +305,37 @@ demand only — automatic generation would fire a call on every filter change an
 
 ## Working on it
 
+Node 22 (`.nvmrc`).
+
 ```bash
-npm install
+npm ci
 npm run dev                        # :5173, expects the API on :8000
 VITE_DEMO_MODE=true npm run dev    # …or no API at all
 
-npm test          # vitest run — 22 files, 180 tests
+npm test          # vitest run — 27 files, 197 tests
 npm run typecheck # tsc --noEmit
-npm run lint      # eslint, --max-warnings 0
+npm run lint      # eslint 10 flat config, --max-warnings 0
 npm run build     # tsc && vite build
 ```
 
-No test makes a network call or a paid API call; the Deal Brief's model provider is
-exercised against a stubbed `fetch`.
+No test makes a network call or a paid API call; `fetch` is stubbed wherever an endpoint is
+exercised, and the Deal Brief's model provider runs against a stubbed `fetch` too. The suite
+pins the API contract the backend changed recently: the first-login body, the neutral reset
+message, `.xls` refusal, `reanalyze` treated as a queued search, and the address-only lease
+edit.
 
 Screenshots are captured from the running container, so they cannot drift from the UI:
 
 ```bash
 docker compose up -d --build
-npm run screenshots   # Playwright chromium, 1440x900 → docs/screenshots/*.png
+npx playwright install chromium    # once
+npm run screenshots   # desktop 1440x900 and phone 390x844 → docs/screenshots/*.png
 docker compose down -v
 ```
+
+`SCREENSHOT_BASE_URL` points the script somewhere other than `http://localhost:8140`.
+
+![The regulation list at phone width](docs/screenshots/07-mobile-regulations.png)
 
 ## A design system, not a component folder
 
@@ -275,6 +345,14 @@ docker compose down -v
 plus five `Field`s — label, control, required marker, error and description as one accessible
 unit — over a `DataTable` with `StatusBadge` cells, `Pagination` below and `StatTile`s above.
 Nothing in it is page-specific, which is why every table in the product looks like a sibling.
+
+The type is IBM Plex Sans for the interface — its figures are even-width, which the money
+and occupancy columns depend on — with page and dialog titles in Source Serif 4, closer to
+the leases and ordinances the product reads than to a generic dashboard. The palette is the
+BnBu crimson over slate, with semantic tones reserved for statuses. Below the `sm`
+breakpoint the stat tiles sit two to a row, and below `md` the navigation becomes a drawer.
+
+![The rental analyzer at phone width](docs/screenshots/06-mobile-rental-analyzer.png)
 
 ```
 src/
@@ -307,16 +385,24 @@ costs more than it saves.
 - **Nothing here is tested against the real API.** The suite runs entirely on fixtures and
   stubs, so a contract change in `bnbu_backend_api` would not fail a test in this repo — it
   would fail at runtime. A shared schema across the two repos is the honest fix.
+- **The reset link has nowhere to land.** The API emails `/reset/<uid>/<token>/` but has no
+  route that accepts the token and a new password, so this console has no page for it either.
 - **Demo mode is a fixture server, not a simulator.** Its writes return success and change
   nothing (`handlers.ts` says as much), and its auth accepts any credentials.
 - **The Deal Brief is not underwriting.** Medians, counts and a break-even check over the
   rows in view. It has no view on comparables, seasonality, financing or condition.
 - **Tokens live in `localStorage`.** Readable by any script on the origin; the mitigation
   is that there are no third-party scripts on this page, which is a policy, not a control.
-- **Recharts is 369 kB for two charts.** Lazy and split out, so it costs only the routes
+- **Recharts is 338 kB for two charts.** Lazy and split out, so it costs only the routes
   that use it, but a smaller library is the next real bundle win.
 - **Token refresh assumes one tab.** Each tab holds its own in-memory mutex, so rotation is
   serialised within a tab and not across them. `BroadcastChannel` would close it.
+- **Still on Tailwind 3.** Tailwind 4 moves configuration into CSS and is a migration of its
+  own.
 - **en-US and USD, hard-coded** in `lib/format.ts`. No i18n, no currency handling.
 - **Accessibility is improved but unaudited.** Consistent focus states, labelled fields and
   dialog semantics come from `ui/`, but there has been no screen-reader pass.
+
+## License
+
+MIT — see `LICENSE`.
