@@ -1,0 +1,34 @@
+/* react-datepicker ships its own stylesheet; these overrides pull it onto the
+   token palette so the date inputs match every other field. This file is
+   imported right after the library's CSS, so it wins at equal specificity.
+
+   The rules sit outside @layer on purpose. Tailwind drops any @layer components
+   rule whose class never appears in the files it scans, and these class names
+   exist only inside the library's markup, so inside the layer every one of
+   them was removed from the build and the date filters rendered as bare,
+   borderless inputs. */
+.react-datepicker-wrapper {
+  @apply block w-full;
+}
+
+.react-datepicker__input-container input {
+  @apply block w-full rounded-md border border-line bg-surface px-3 py-2 text-base text-ink placeholder:text-ink-subtle;
+}
+
+.react-datepicker {
+  @apply border-line font-sans text-sm shadow-raised;
+}
+
+.react-datepicker__header {
+  @apply border-line bg-surface-sunken;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range,
+.react-datepicker__day--keyboard-selected {
+  @apply bg-brand-500 text-white;
+}
+
+.react-datepicker__day--in-selecting-range {
+  @apply bg-brand-200 text-brand-900;
+}
