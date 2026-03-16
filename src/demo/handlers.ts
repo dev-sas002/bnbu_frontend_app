@@ -64,6 +64,9 @@ export const handleDemoRequest = (args: string | FetchArgs): DemoResult => {
   if (url.startsWith('account/logout/')) return ok({ message: 'Logged out' });
   if (url.startsWith('account/profile/')) return ok(DEMO_USER);
   if (url.startsWith('account/dashboard/')) return ok({ user_type: DEMO_USER.user_type });
+  if (url.startsWith('account/password/reset/')) {
+    return ok({ message: 'If that address has an account, a reset link is on its way.' });
+  }
   if (url.startsWith('account/password/')) return ok({ message: 'Password updated' });
 
   // --- users ------------------------------------------------------------

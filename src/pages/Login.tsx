@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import bnbLogo from '@/assets/images/bnb_logo.webp';
+import ForgotPasswordDialog from '@/components/ForgotPasswordDialog';
 import { isDemoMode } from '@/demo/demoBaseQuery';
 import { useLazyGetUserProfileQuery, useLoginMutation } from '@/services/api';
 import { useAppDispatch, useAppSelector } from '@/store';
@@ -36,6 +37,7 @@ const Login: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isResetOpen, setResetOpen] = useState(false);
   const [rememberMe, setRememberMe] = useState(
     () => localStorage.getItem('rememberMe') === 'true'
   );
@@ -194,15 +196,25 @@ const Login: React.FC = () => {
                 />
                 Remember me
               </label>
-              <span className="text-sm text-ink-subtle" title="Contact an administrator to reset a password">
+              <button
+                type="button"
+                onClick={() => setResetOpen(true)}
+                className="rounded text-sm font-medium text-brand-700 underline-offset-2 hover:underline"
+              >
                 Forgot your password?
-              </span>
+              </button>
             </div>
 
             <Button type="submit" className="w-full" loading={isLoading || isLoadingProfile}>
               Sign in
             </Button>
           </form>
+
+          <ForgotPasswordDialog
+            isOpen={isResetOpen}
+            onClose={() => setResetOpen(false)}
+            initialEmail={email}
+          />
         </div>
       </div>
 
