@@ -23,7 +23,7 @@ const StatTile: React.FC<StatTileProps> = ({ label, value, caption, loading, cla
     {loading ? (
       <Skeleton className="mt-2 h-7 w-24" />
     ) : (
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums text-ink">{value}</p>
+      <p className="mt-1.5 text-xl font-semibold tabular-nums text-ink sm:text-2xl">{value}</p>
     )}
     {caption && <p className="mt-1 text-xs text-ink-subtle">{caption}</p>}
   </div>
