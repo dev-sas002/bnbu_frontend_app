@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegulationSearchBar, { RegulationSearchFilters } from '@/components/RegulationSearchBar';
 import RegulationTable from '@/components/RegulationTable';
@@ -23,25 +23,23 @@ const RegulationManagement: React.FC = () => {
   const [filters, setFilters] = useState<RegulationSearchFilters>(NO_FILTERS);
 
   const visible = useDocumentVisible();
-  // A new search or a re-analysis can come back 202 and be finished by a
-  // worker later, so the page keeps re-reading itself while any row on it is
-  // still owed an answer, and stops once none is.
-  const [awaiting, setAwaiting] = useState(false);
-  const pollingInterval = awaiting && visible ? POLL_MS : 0;
 
   const filtered = hasFilters(filters);
-  const listQuery = useGetRegulationsQuery(page, { skip: filtered, pollingInterval });
-  const searchQuery = useSearchRegulationsQuery(
-    { ...filters, page },
-    { skip: !filtered, pollingInterval }
-  );
+  const searchArgs = { ...filters, page };
+  const listQuery = useGetRegulationsQuery(page, { skip: filtered });
+  const searchQuery = useSearchRegulationsQuery(searchArgs, { skip: !filtered });
   const active = filtered ? searchQuery : listQuery;
 
   const regulations = useMemo(() => active.data?.results ?? [], [active.data]);
 
-  useEffect(() => {
-    setAwaiting(regulations.some(isAwaitingAnswer));
-  }, [regulations]);
+  // A new search or a re-analysis can come back 202 and be finished by a
+  // worker later. While any row on this page is still owed an answer, a
+  // second subscription to the same cache entry polls it; RTK Query shares
+  // the entry, so the table above refreshes, and polling stops by itself.
+  const awaiting = regulations.some(isAwaitingAnswer);
+  const pollingInterval = visible ? POLL_MS : 0;
+  useGetRegulationsQuery(page, { skip: filtered || !awaiting, pollingInterval });
+  useSearchRegulationsQuery(searchArgs, { skip: !filtered || !awaiting, pollingInterval });
 
   const outcomes = useMemo(() => {
     const allowed = regulations.filter((row) => row.status === 'STR Allowed').length;

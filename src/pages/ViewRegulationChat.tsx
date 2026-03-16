@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import RegulationChatBox from '@/components/RegulationChatBox';
@@ -24,21 +24,21 @@ const ViewRegulationChat: React.FC = () => {
   const { regulationId } = useParams<{ regulationId: string }>();
   const visible = useDocumentVisible();
 
-  // Polling is switched on from the previous render's data: a queued row is
-  // re-read until a worker finishes it, and then polling stops by itself.
-  const [awaiting, setAwaiting] = useState(false);
   const {
     data: regulation,
     isLoading,
     isError,
     refetch,
-  } = useGetRegulationByIdQuery(regulationId, {
-    skip: !regulationId,
-    pollingInterval: awaiting && visible ? POLL_MS : 0,
+  } = useGetRegulationByIdQuery(regulationId, { skip: !regulationId });
+
+  // A second subscription to the same cache entry, alive only while a worker
+  // owes this row an answer. RTK Query shares the entry, so its polls refresh
+  // the data above, and polling stops by itself once the answer lands.
+  const awaiting = regulation ? isAwaitingAnswer(regulation) : false;
+  useGetRegulationByIdQuery(regulationId, {
+    skip: !regulationId || !awaiting,
+    pollingInterval: visible ? POLL_MS : 0,
   });
-  useEffect(() => {
-    setAwaiting(regulation ? isAwaitingAnswer(regulation) : false);
-  }, [regulation]);
 
   const [reanalyze, { isLoading: isReanalyzing }] = useReanalyzeRegulationMutation();
 
@@ -76,7 +76,6 @@ const ViewRegulationChat: React.FC = () => {
     );
   }
 
-  const researching = isAwaitingAnswer(regulation);
 
   return (
     <div className="space-y-5">
@@ -93,7 +92,7 @@ const ViewRegulationChat: React.FC = () => {
             variant="secondary"
             onClick={handleReanalyze}
             loading={isReanalyzing}
-            disabled={researching}
+            disabled={awaiting}
             icon={<SparkIcon className="h-4 w-4" />}
           >
             Look again
@@ -101,7 +100,7 @@ const ViewRegulationChat: React.FC = () => {
         }
       />
 
-      {researching && (
+      {awaiting && (
         <p role="status" className="rounded-md bg-info-bg px-3 py-2.5 text-sm text-info-fg">
           RegAdvisor AI is researching this search. This page updates when the answer lands
           {regulation.gpt_response?.message ? '; the previous answer is shown until then.' : '.'}
