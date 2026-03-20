@@ -1,0 +1,56 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-surface-sunken text-base text-ink;
+    font-family: theme('fontFamily.sans');
+  }
+
+  /* One focus treatment for the whole product. Every interactive element
+     inherits it, so keyboard users get a visible ring without each component
+     having to remember one. :focus-visible keeps it off mouse clicks. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-surface;
+  }
+
+  ::selection {
+    @apply bg-brand-100 text-brand-900;
+  }
+}
+
+@layer components {
+  /* react-datepicker ships its own stylesheet; these overrides pull it onto
+     the token palette so the date inputs match every other field. */
+  .react-datepicker-wrapper {
+    @apply block w-full;
+  }
+
+  .react-datepicker__input-container input {
+    @apply block w-full rounded-md border border-line bg-surface px-3 py-2 text-base text-ink placeholder:text-ink-subtle;
+  }
+
+  .react-datepicker {
+    @apply border-line font-sans text-sm shadow-raised;
+  }
+
+  .react-datepicker__header {
+    @apply border-line bg-surface-sunken;
+  }
+
+  .react-datepicker__day--selected,
+  .react-datepicker__day--in-range,
+  .react-datepicker__day--keyboard-selected {
+    @apply bg-brand-500 text-white;
+  }
+
+  .react-datepicker__day--in-selecting-range {
+    @apply bg-brand-200 text-brand-900;
+  }
+}
