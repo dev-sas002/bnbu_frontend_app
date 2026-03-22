@@ -1,310 +1,322 @@
 # BnBu Console
 
-A web console for short-term-rental investors. You upload a spreadsheet of candidate
-listings and the backend prices each one against market ADR and occupancy; you upload
-lease PDFs and an AI review reads them for clauses that affect nightly letting; and you
-ask whether a given city allows short-term rentals at all and keep the answers.
+A short-term-rental investor has three recurring questions: *does this lease let me list
+the unit nightly*, *does this city allow it at all*, and *does this listing actually make
+money*. BnBu Console is the browser client that answers them — React 18 + TypeScript on
+Vite, talking to the sibling Django service `bnbu_backend_api`.
 
-It is a browser-only client. Every figure and every AI analysis comes from
-[the BnBu API](../bnbu_backend_api) — nothing is computed on the server here. The one
-exception is the Deal Brief, described under [Design notes](#design-notes).
+Every figure and every AI analysis comes from that API; nothing is computed in this repo
+except the Deal Brief's fallback arithmetic.
 
-## Screenshots
+![The rental analyzer: stat tiles, a profit distribution chart and a generated Deal Brief](docs/screenshots/01-rental-analyzer.png)
 
-Captured from the Docker image running in demo mode, so the data behind them is the
-seeded fixture set rather than a snapshot of somebody's database.
+That is the rental analyzer. You upload a spreadsheet of candidate listings, the backend
+prices each against market ADR and occupancy, and the page puts the batch in context: how
+many cleared the profit threshold, how the profits are distributed, and a written read on
+the rows in view. Every screenshot here is the Docker image running in demo mode, so the
+data behind them is the seeded fixture set rather than somebody's database.
 
-**Rental analyzer** — listings priced against market, with the profit distribution and a
-generated Deal Brief.
+Two details there are deliberate: the loss bin is the only red bar *and* the only one
+labelled "Loss", so meaning never rests on colour alone; and the brief's footer reads
+`Computed from the rows in view — no model involved.` — no key is configured, and it works.
 
-![Rental analyzer](docs/screenshots/01-rental-analyzer.png)
-
-**Lease review** — the AI's initial analysis of an uploaded lease, and a follow-up
-conversation scoped to that document.
-
-![Lease review](docs/screenshots/02-lease-review.png)
-
-**Regulation searches** — saved "can I run an STR here?" questions and their outcomes.
-
-![Regulation searches](docs/screenshots/03-regulations.png)
-
-**Admin** — the user table with the edit dialog open.
-
-![Admin user form](docs/screenshots/04-admin-user-form.png)
-
-## Architecture
-
-The pattern is **feature-sliced presentation over a single typed data layer**. Components
-never call `fetch`. They call a generated RTK Query hook; that hook's endpoint is declared
-in `services/endpoints/`; every endpoint shares one base query that owns authentication,
-token refresh and cache invalidation. Dependencies point inward: `pages` → `features` and
-`components` → `ui` and `lib`, with `services` underneath and `types` at the bottom.
-
-```mermaid
-graph TD
-    subgraph Presentation
-        P["pages/<br/>route components"]
-        F["features/<br/>dealBrief, chat"]
-        C["components/<br/>tables, modals, forms"]
-    end
-    subgraph Design system
-        U["ui/<br/>Button, Card, DataTable,<br/>Field, StatusBadge, charts"]
-        L["lib/<br/>formatting helpers"]
-    end
-    subgraph Data
-        A["services/endpoints/<br/>injectEndpoints per domain"]
-        B["services/baseApi.ts<br/>auth · refresh · cache tags"]
-        S["store/<br/>auth + rentalTask slices"]
-    end
-    subgraph Transport
-        R["baseQueryWithReauth<br/>→ BnBu API"]
-        D["demoBaseQuery<br/>→ src/demo fixtures"]
-    end
-    T["types/<br/>API contracts"]
-
-    P --> F
-    P --> C
-    P --> U
-    F --> U
-    C --> U
-    U --> L
-    P --> A
-    F --> A
-    C --> A
-    A --> B
-    B --> S
-    B --> R
-    B --> D
-    A -.typed by.-> T
-    R -.typed by.-> T
-```
-
-Two transports sit behind the same endpoint definitions. `VITE_DEMO_MODE=true` swaps
-`baseQuery` for one that answers from `src/demo/fixtures.ts`; the endpoints, the cache
-tags and every component above them are byte-identical either way. That is what makes the
-screenshots above reproducible without a backend.
-
-## How a request flows
-
-The interesting path is an authenticated query whose access token has expired, because it
-is where the data layer earns its keep.
-
-```mermaid
-sequenceDiagram
-    participant C as Component
-    participant Q as RTK Query cache
-    participant B as baseQueryWithReauth
-    participant M as refresh mutex
-    participant API as BnBu API
-
-    C->>Q: useGetRentalsQuery({ page, filters })
-    alt cached and fresh
-        Q-->>C: cached rows
-    else
-        Q->>B: fetch
-        B->>M: waitForUnlock()
-        B->>API: GET /api/rental_properties/… (Bearer access)
-        API-->>B: 401
-        B->>M: acquire() (single flight)
-        B->>API: POST /api/token/refresh/ (refresh)
-        alt refresh succeeds
-            API-->>B: { access }
-            B->>B: store token, dispatch auth/setToken
-            B->>API: replay original request
-            API-->>B: 200 rows
-            B-->>Q: data
-            Q-->>C: rows + tags [RentalProperty:id…, LIST]
-        else refresh fails
-            API-->>B: 401
-            B->>B: dispatch auth/sessionExpired
-            B-->>C: redirect to /
-        end
-        M-->>B: release()
-    end
-
-    C->>Q: useUploadRentalsMutation()
-    Q->>API: POST listings
-    Q->>Q: invalidate RentalProperty:LIST
-    Q-->>C: affected tables refetch, others untouched
-```
-
-Concurrent 401s wait on the mutex rather than each starting their own refresh, so a
-dashboard firing six queries at once rotates the refresh token once, not six times.
-
-## Quickstart
-
-One command, no backend, no manual steps:
+## Run it
 
 ```bash
 docker compose up --build       # http://localhost:8140
 ```
 
-That builds the app with `VITE_DEMO_MODE=true` and serves the static bundle from
-nginx. The console comes up populated with the seeded fixture set — users, priced
-listings, lease reviews and regulation searches — so it is not eight empty tables on
-first boot. Sign in with any email and the password `demo`; the demo transport accepts
-anything and the login screen says so.
+Compose builds with `VITE_DEMO_MODE=true`, so the console boots populated — users, priced
+listings, lease reviews, regulation searches — with no backend running and no seed step.
+The login form is pre-filled and the demo transport accepts anything.
 
-To run it against a real API instead:
+Against a real API instead:
 
 ```bash
 VITE_DEMO_MODE=false VITE_API_URL=http://host.docker.internal:8000/ \
   docker compose up --build
 ```
 
-Vite inlines `VITE_*` values at build time, so these are **build args**, not runtime
-environment variables — a built image is pinned to whatever it was built with.
+Vite inlines `VITE_*` values at build time, so those are **build args**: an image is pinned
+to whatever it was built with. The runtime stage is `nginx-unprivileged` as uid 101, with no
+build tooling in it and a fallback to `index.html` so a refresh on a route does not 404.
 
-## Configuration
+Verified 2026-09-23: `docker compose config` parses, `docker compose build` succeeds, and
+`docker compose up -d` brought the container to `Up (healthy)` on `0.0.0.0:8140->8080` with
+`/` → 200, `/healthz` → 200 and the deep link `/rental-analyzer` → 200.
 
-| Variable | Required | Default | What it does |
+## What happens when you upload a lease
+
+The lease path is the one worth drawing: two chained mutations, a cache invalidation that
+replaces a pile of manual `refetch()` calls, and a poll that has to end on its own.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Investor
+    participant M as UploadLeaseModal
+    participant Q as RTK Query
+    participant API as BnBu API
+    participant AI as LeaseGuard review
+
+    U->>M: address + one or more PDFs
+    M->>Q: useUploadLeaseMutation(FormData)
+    Q->>API: POST api/leases/upload/
+    API-->>Q: lease + documents[]
+    Q->>Q: invalidate Lease:LIST, Document:LIST
+    Note over Q: the lease table refetches itself,<br/>nothing calls refetch() by hand
+
+    Q->>API: POST api/documents/review/ {document_ids}
+    API->>AI: queue the review
+    API-->>Q: accepted
+    Q->>Q: invalidate Document, Lease, DocumentChat
+
+    U->>Q: open /lease/:id/documents/:docId/notes
+    loop while gpt_response.status is "Pending"
+        Q->>API: GET api/documents/:docId/get-chat-history/
+        API-->>Q: status "Pending", no message yet
+    end
+    AI-->>API: clauses, risks, what to negotiate
+    Q->>API: GET api/documents/:docId/get-chat-history/
+    API-->>Q: status "Approved", analysis text
+    Q-->>U: analysis card renders, polling stops
+
+    U->>Q: "Can I sublet this unit nightly?"
+    Q->>API: POST api/documents/:docId/chat/
+    API-->>Q: reply
+    Q->>Q: invalidate DocumentChat:docId
+```
+
+Kicking off the review is a second call, and a failure there leaves the lease uploaded but
+unanalysed — `LeaseManagement.tsx` says so at the call site rather than pretending otherwise.
+
+![A lease review: the initial analysis beside a follow-up conversation](docs/screenshots/02-lease-review.png)
+
+The result is that page: the one-off analysis on the left, a conversation scoped to the same
+document on the right. One `ChatPanel` renders both the lease and the regulation
+conversations — they differ only in endpoints and in what the assistant is called.
+
+## How long it waits for an answer
+
+An analysis takes minutes, and the only way to know it has landed is to ask. The rule the
+code follows is that asking should get cheaper the longer the wait goes on, and should
+stop entirely rather than run forever.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending : POST api/documents/review/
+
+    state Pending {
+        direction LR
+        state "Polling get-chat-history" as Polling
+        state "Paused, tab hidden" as Paused
+        [*] --> Polling
+        Polling --> Paused : document hidden
+        Paused --> Polling : document visible
+        Polling --> Polling : widen 3s 5s 8s 13s 21s 30s
+    }
+
+    Pending --> Approved : status leaves "Pending"
+    Pending --> Rejected : status leaves "Pending"
+    Pending --> Abandoned : uploaded more than 20 minutes ago
+
+    state "Stopped waiting" as Abandoned
+
+    Approved --> [*]
+    Rejected --> [*]
+    Abandoned --> [*]
+```
+
+`POLL_SCHEDULE_MS` in `hooks/useChatHistoryPolling.ts` is the ladder and `POLLS_PER_STAGE`
+is 4, so a twenty-minute wait is `4 × (3+5+8+13+21) = 200s` of fast polling plus the
+remaining ~1,000s at 30s: about 53 requests, against 400 for the flat
+`setInterval(refetch, 3000)` the hook's comment records it replacing. The two regions above
+are independent — a hidden tab sets the interval to zero while the backoff keeps widening.
+
+The fetching is RTK Query's `pollingInterval` rather than a timer per component, so two
+views of the same document share one poll. `DocumentChat` is a separate cache tag from
+`Document` precisely so a poll tick does not drag the lease's document list along with it.
+
+## Regulation searches, and two small honesties
+
+![Saved regulation searches with outcome badges and answer previews](docs/screenshots/03-regulations.png)
+
+Ask whether a city permits short-term rentals, keep the answer, filter the pile later. Two
+things in that table are worth pointing at:
+
+- The Savannah row reads **Researching**, not a grey `pending`. The Django model defaults to
+  a lowercase `pending` — a different shape from the title-cased `STR Allowed` /
+  `STR Not Allowed` values the rest of the column carries — so it reaches the UI as a status
+  no badge had been written for. `ui/statusRegistry.ts` gives it an entry. Every
+  status in the product — lease, document, regulation, rental — resolves through that
+  registry, so adding one is a line of data rather than another `switch` in another
+  component.
+- The Kirkland preview reads `SHORT-TERM RENTALS ALLOWED WITH RESTRICTIONS`, not
+  `**SHORT-TERM RENTALS ALLOWED WITH RESTRICTIONS**`. The stored answers are markdown, and
+  `plainTextPreview()` in `lib/format.ts` strips the syntax for one-line previews — rendering
+  markdown properly in a table cell would pull a 118 kB renderer onto a list route.
+
+## One typed data layer
+
+No component in `src/` calls `fetch`. Every call goes through an RTK Query hook whose
+endpoint is declared in `services/endpoints/` and attached with `injectEndpoints`, and
+`services/baseApi.ts` owns exactly three things: where the API is, how a request is
+authenticated, and what the cache tags are. Dependencies point inward — `pages` →
+`features`/`components` → `ui`/`lib` → `services` → `types`.
+
+**Invalidation is declarative.** Nine tag types (`User`, `Profile`, `Lease`, `Document`,
+`DocumentChat`, `Regulation`, `RegulationChat`, `RentalProperty`, `RentalTask`) replaced
+three booleans on the auth slice that pages watched in order to call `refetch()` by hand.
+A mutation now invalidates the tag it affects and unrelated tables are left alone, which
+is what lets `keepUnusedDataFor` be 60 seconds instead of 0.
+
+**Token refresh is single-flight.** `services/mutex.ts` is thirty lines of async mutex —
+`baseQueryWithReauth` waits on it before every request, and on a 401 exactly one caller
+rotates the refresh token while the others wait and retry. A dashboard firing six queries
+at once against an expired token refreshes once, not six times, and the originals are
+replayed transparently. If the refresh itself fails, `auth/sessionExpired` is dispatched and
+the login screen explains why you are back there.
+
+**Two transports, one set of endpoints.** `VITE_DEMO_MODE=true` swaps the base query for
+one answering from `src/demo/fixtures.ts`; the endpoints, the tags and every component above
+them are identical either way, which is what makes the screenshots here reproducible with no
+backend. The fixtures sit behind a dynamic `import()`, so an ordinary build never fetches them.
+
+## The bundle was the bottleneck
+
+The backend was never the slow part; the first load was. What ships today:
+
+| Chunk | Raw | Gzip | When it loads |
 | --- | --- | --- | --- |
-| `VITE_API_URL` | No | `http://localhost:8000/` | Base URL of the BnBu API. Must end in `/`. Unset logs a warning and uses the default, rather than resolving against the page origin and 404ing silently. |
-| `VITE_DEMO_MODE` | No | `false` (`true` in Compose) | `'true'` answers every request from `src/demo/fixtures.ts` instead of the network. No backend needed. |
-| `VITE_AI_PROXY_URL` | No | unset | URL of a server-side proxy that talks to a language model for the Deal Brief. Unset means the brief falls back to its computed provider. |
-| `VITE_AI_MODEL` | No | unset | Model name passed through to that proxy. |
-| `VITE_ENV` | No | unset | Label only; nothing in `src/` branches on it. |
+| `index` (app shell + Login) | 114.1 kB | 37.9 kB | always |
+| `vendor-react` | 165.0 kB | 53.7 kB | always |
+| `vendor-redux` | 42.9 kB | 14.6 kB | always |
+| `vendor-charts` (Recharts) | 369.5 kB | 101.9 kB | the two charting routes |
+| `vendor-forms` (formik, yup, datepicker, dropzone) | 298.4 kB | 82.1 kB | routes with forms |
+| `vendor-markdown` | 117.4 kB | 36.1 kB | routes that render an analysis |
 
-**Never put an API key in a `VITE_*` variable.** Vite inlines them into the shipped
-bundle, where anyone can read them. `VITE_AI_PROXY_URL` points at a service that holds
-the key server-side; that is the whole reason the Deal Brief is proxied rather than
-calling a vendor directly.
+That is **322 kB raw / 106 kB gzip** on the critical path — the three rows nginx serves
+before anything is clicked, which you can confirm from the `<script>` and `modulepreload`
+tags in `dist/index.html` after `npm run build`. The whole `dist/` is 1,328 kB, images
+included. Every signed-in page is `lazy()`; `Login` is the deliberate exception, being the
+entry point for every unauthenticated visit.
 
-## Development
+The one non-obvious part is in `vite.config.ts`, and it is reproducible in one line. The
+`vendor-react` manual chunk lists `'react/jsx-runtime'` explicitly, because it is a
+separate entry point from `'react'`. Delete that one string and rebuild: Rollup lets
+`vendor-markdown` absorb it, the entry chunk imports `jsx` from there, and `dist/index.html`
+grows a third `modulepreload` — the 118 kB markdown renderer, on the critical path of every
+route, including routes with no markdown on them: 322 kB becomes 440 kB for a chunking
+accident. Nothing in the build complains: the critical path grows, but no single chunk
+crosses the 400 kB `chunkSizeWarningLimit`. That is why the reason for that one string is
+written out in `vite.config.ts` rather than left to be rediscovered.
+
+## Remember me remembers an email
+
+"Remember me" stores the email address and nothing else. `Login.tsx` also calls
+`localStorage.removeItem('password')` on mount, unconditionally — an older build of this
+app wrote the user's plaintext password there, and this clears it out of existing browsers
+on the next visit rather than leaving it readable by any script on the origin. Two tests in
+`pages/__tests__/Login.test.tsx` pin the behaviour: *"never writes the password to
+localStorage"* and *"prefills the remembered email and clears any legacy stored password"*.
+
+## Build-time configuration
+
+Declared in `src/vite-env.d.ts`, which is the file to read if this table and the code ever
+disagree.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `VITE_API_URL` | `http://localhost:8000/` | Base URL of the BnBu API; must end in `/`. Unset logs a warning and uses the default, rather than resolving against the page origin and 404ing silently. |
+| `VITE_DEMO_MODE` | `false` (`true` in Compose) | `'true'` answers every request from `src/demo/fixtures.ts`. No backend needed. |
+| `VITE_AI_PROXY_URL` | unset | A proxy **you** deploy that talks to a language model for the Deal Brief. Unset means the brief falls back to its computed provider. |
+| `VITE_AI_MODEL` | `claude-sonnet-4-5` | Model name passed through to that proxy. |
+| `VITE_ENV` | unset | Declared for the deploy environments; `grep -r VITE_ENV src/` finds only the type declaration. Nothing branches on it. |
+
+**Never put an API key in a `VITE_*` variable.** Vite inlines them into the shipped bundle
+where anyone can read them. That constraint is the entire reason the Deal Brief goes
+through a proxy: `providers/model.ts` holds no key and cannot.
+
+That shapes the feature itself. `features/dealBrief/providers/` is an ordered array, each
+provider declaring `isAvailable()`; the first available one wins and the heuristic provider
+is the guaranteed tail, so resolution never returns undefined. If a configured model
+provider throws, the brief falls back and the panel names whoever wrote it. It generates on
+demand only — automatic generation would fire a call on every filter change and poll tick.
+
+## Working on it
 
 ```bash
 npm install
-npm run dev            # http://localhost:5173, expects the API on :8000
-VITE_DEMO_MODE=true npm run dev   # …or no API at all
+npm run dev                        # :5173, expects the API on :8000
+VITE_DEMO_MODE=true npm run dev    # …or no API at all
 
-npm test               # vitest run — 22 files, 180 tests
-npm run typecheck      # tsc --noEmit
-npm run lint           # eslint, --max-warnings 0
-npm run build          # tsc && vite build
+npm test          # vitest run — 22 files, 180 tests
+npm run typecheck # tsc --noEmit
+npm run lint      # eslint, --max-warnings 0
+npm run build     # tsc && vite build
 ```
 
-Screenshots are regenerated from the running container, so they never drift from the
-committed UI:
+No test makes a network call or a paid API call; the Deal Brief's model provider is
+exercised against a stubbed `fetch`.
+
+Screenshots are captured from the running container, so they cannot drift from the UI:
 
 ```bash
 docker compose up -d --build
-npm run screenshots    # writes docs/screenshots/*.png at 1440x900
+npm run screenshots   # Playwright chromium, 1440x900 → docs/screenshots/*.png
 docker compose down -v
 ```
 
-No test makes a network call or a paid API call. The Deal Brief's model provider is
-exercised against a stubbed `fetch`.
+## A design system, not a component folder
 
-## Project structure
+![The user table with the edit dialog open over it](docs/screenshots/04-admin-user-form.png)
+
+`src/ui/` is the only place that knows what the product looks like. That dialog is `Modal`
+plus five `Field`s — label, control, required marker, error and description as one accessible
+unit — over a `DataTable` with `StatusBadge` cells, `Pagination` below and `StatTile`s above.
+Nothing in it is page-specific, which is why every table in the product looks like a sibling.
 
 ```
 src/
-├── ui/                  Design system. The only place that knows what the product
-│   │                    looks like: spacing, palette, focus rings, states.
-│   ├── DataTable.tsx    Sorting, empty/loading/error states, virtualises past 150 rows
-│   ├── Field.tsx        Label + control + error + description, one accessible unit
-│   ├── StatusBadge.tsx  Renders any status via statusRegistry
-│   ├── statusRegistry.ts  Status vocabularies — add a status, not a switch
+├── ui/                  Design system: spacing, palette, focus rings, states
+│   ├── DataTable.tsx    Sorting, empty/loading/error states, windows past 150 rows
+│   ├── Field.tsx        Label + control + error + description, one unit
+│   ├── statusRegistry.ts  Status vocabularies as data
 │   └── charts/          Recharts wrappers sharing one theme
 ├── lib/format.ts        Currency, dates, occupancy, markdown-free previews
 ├── features/
-│   ├── dealBrief/       The AI feature: stats, provider registry, panel
-│   │   └── providers/   heuristic (always available) + model (needs a proxy)
-│   └── chat/            The shared conversation UI, used by leases and regulations
+│   ├── dealBrief/       Stats, provider registry, panel
+│   └── chat/            The conversation UI, shared by leases and regulations
 ├── services/
 │   ├── baseApi.ts       One RTK Query instance: auth, refresh mutex, cache tags
 │   ├── endpoints/       One file per domain, attached via injectEndpoints
-│   ├── mutex.ts         Single-flight primitive for token refresh
-│   └── queryString.ts   Builds filter params without empty keys
+│   └── mutex.ts         Single-flight primitive for token refresh
 ├── store/               Redux store; auth + rentalTask slices
 ├── hooks/               useChatHistoryPolling (backoff), useDocumentVisible
-├── types/               API request/response contracts
 ├── demo/                Fixtures and a base query that serves them
 ├── pages/               Route components, all lazy except Login
 └── components/          Domain components composed from ui/
 ```
 
-## Design notes
+`DataTable` windows its body past 150 rows, keeping the DOM flat when a batch upload returns
+several thousand listings; below that it renders normally, because windowing a 20-row table
+costs more than it saves.
 
-**Why RTK Query owns invalidation.** Three booleans lived on the auth slice —
-`refreshDocuments`, `refreshRegulations`, `refreshRentals` — and pages watched them to
-call `refetch()` by hand. That refetched everything any mounted page was subscribed to,
-whether or not the mutation had touched it, and it needed `keepUnusedDataFor: 0` on most
-queries to behave at all, which disabled the cache outright. Those are now nine cache
-tags. A mutation invalidates the tag it actually affects; unrelated tables are left
-alone; and the cache holds for 60 seconds, so paging back and forth is instant.
+## Known gaps
 
-**The bottleneck was the bundle, not the backend.** The app shipped as one 1,151 kB
-JavaScript chunk plus 2.8 MB of PNGs — a 2.59 MB decorative image among them — on every
-first load, before the user had seen anything. Three things fixed it:
-
-- Route-level `lazy()` on every signed-in page, so the first load is the login screen
-  and the shell.
-- `manualChunks` splitting the vendor half, which is the larger and almost never
-  changes. `react/jsx-runtime` has to be named explicitly in the React group: without
-  it Rollup let the markdown chunk absorb it, the entry chunk then imported `jsx` from
-  there, and the 118 kB markdown renderer sat on the critical path of every route.
-- The 2.59 MB PNG deleted and the logo re-encoded as an 8 kB WebP.
-
-| | Before | After |
-| --- | --- | --- |
-| Initial JS (raw) | 1,151.3 kB | 321.6 kB |
-| Initial JS (gzip) | 335.2 kB | 106.0 kB |
-| Images | 2,822.6 kB | 8.8 kB |
-| Total `dist/` | 3,960 kB | 1,328 kB |
-
-The chart library (369 kB), the form stack (298 kB) and the markdown renderer (117 kB)
-are now fetched only by the routes that use them.
-
-**Polling that backs off.** A lease analysis takes minutes. The old chat view ran
-`setInterval(refetch, 3000)` for as long as the page was open, so one tab could issue
-around 400 requests for a single document, and it kept firing while the tab was hidden.
-`useChatHistoryPolling` widens the interval in stages (3s → 30s) and pauses entirely when
-the document is hidden; the same twenty-minute wait now costs about 50 requests. The
-fetching is RTK Query's own `pollingInterval`, so subscribers to the same document share
-one poll instead of each running a timer.
-
-**Long tables.** `DataTable` renders a windowed slice past 150 rows, keeping the DOM flat
-when a batch upload returns several thousand listings. Below that threshold it renders
-normally — windowing a 20-row table costs more than it saves.
-
-**The extensibility seam: a provider registry.** The Deal Brief resolves its generator
-from an ordered list of providers, each of which declares whether it is available. The
-model provider is available only when `VITE_AI_PROXY_URL` is set; the heuristic provider
-always is, and is the guaranteed tail of the list. Adding a vendor, an on-prem model or
-a canned brief for a demo means writing one file and adding it to that array — nothing
-else in the app knows providers exist. The same idea is in `ui/statusRegistry.ts`: status
-vocabularies are data, so a new lease status is a registry entry rather than another
-`switch` in another component.
-
-**The AI feature degrades rather than fails.** The Deal Brief is generated on demand,
-never on mount — with a model provider configured, generating automatically would fire a
-call on every filter change and every poll tick. If the chosen provider throws (proxy
-down, bad payload, network), the heuristic provider produces the brief instead and the
-panel says which one wrote it. With no proxy configured at all the feature still works;
-the footer reads "Computed from the rows in view — no model involved."
-
-**Security.** "Remember me" used to write the user's plaintext password to
-`localStorage`. It now stores the email only, and actively deletes the legacy `password`
-key on mount so existing browsers are cleaned up on next visit.
-
-## Limitations
-
-- **No tests against the real API.** The suite runs entirely against fixtures and stubs.
-  A contract change in `bnbu_backend_api` would not break a test here; it would break the
-  app at runtime.
-- **Demo mode is a fixture server, not a simulator.** Writes in demo mode are accepted
-  and reflected in the UI but are not persisted across a reload, and its auth accepts
-  any credentials.
-- **The Deal Brief is not underwriting.** The heuristic provider does arithmetic on the
-  rows in view — medians, counts, a break-even check. It has no view on comparables,
-  seasonality, financing or condition, and it should not be read as investment advice.
-- **No i18n and no currency handling.** Everything is en-US and USD, hard-coded in
-  `lib/format.ts`.
-- **Accessibility is improved but unaudited.** Focus states, labelled fields and dialog
-  semantics are consistent through `ui/`, but there has been no screen-reader pass.
-- **Bundle still carries Recharts.** 369 kB for two charts is poor value; it is split out
-  and lazy, so it costs only the two routes that use it, but a smaller library would be
-  the next real win.
-- **Token refresh assumes one tab.** Two tabs refreshing simultaneously each hold their
-  own in-memory mutex; the rotation is serialised within a tab, not across them.
+- **Nothing here is tested against the real API.** The suite runs entirely on fixtures and
+  stubs, so a contract change in `bnbu_backend_api` would not fail a test in this repo — it
+  would fail at runtime. A shared schema across the two repos is the honest fix.
+- **Demo mode is a fixture server, not a simulator.** Its writes return success and change
+  nothing (`handlers.ts` says as much), and its auth accepts any credentials.
+- **The Deal Brief is not underwriting.** Medians, counts and a break-even check over the
+  rows in view. It has no view on comparables, seasonality, financing or condition.
+- **Tokens live in `localStorage`.** Readable by any script on the origin; the mitigation
+  is that there are no third-party scripts on this page, which is a policy, not a control.
+- **Recharts is 369 kB for two charts.** Lazy and split out, so it costs only the routes
+  that use it, but a smaller library is the next real bundle win.
+- **Token refresh assumes one tab.** Each tab holds its own in-memory mutex, so rotation is
+  serialised within a tab and not across them. `BroadcastChannel` would close it.
+- **en-US and USD, hard-coded** in `lib/format.ts`. No i18n, no currency handling.
+- **Accessibility is improved but unaudited.** Consistent focus states, labelled fields and
+  dialog semantics come from `ui/`, but there has been no screen-reader pass.
