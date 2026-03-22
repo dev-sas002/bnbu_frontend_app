@@ -1,0 +1,29 @@
+# One command, no manual steps:
+#
+#   docker compose up --build        -> http://localhost:8140
+#
+# The default profile boots in demo mode, so the console comes up populated
+# with seeded data and needs no backend. To run it against a real API:
+#
+#   VITE_DEMO_MODE=false VITE_API_URL=http://host.docker.internal:8000/ \
+#     docker compose up --build
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        # Vite inlines VITE_* at build time, so these are build args.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/}
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-true}
+        VITE_AI_PROXY_URL: ${VITE_AI_PROXY_URL:-}
+    image: bnbu-console:local
+    ports:
+      - "8140:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://127.0.0.1:8080/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
